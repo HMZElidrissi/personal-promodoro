@@ -1,14 +1,14 @@
-import type { AppState, Session, Distraction, TodoItem } from "./types";
-import { DEFAULT_SETTINGS } from "./types";
+import type { AppState, Session, Distraction, TodoItem } from './types';
+import { DEFAULT_SETTINGS } from './types';
 
-const STORAGE_KEY = "pomodoro-app-state";
+const STORAGE_KEY = 'pomodoro-app-state';
 
 function todayString(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
 export function loadState(): AppState {
-  if (typeof window === "undefined") {
+  if (typeof window === 'undefined') {
     return getDefaultState();
   }
   try {
@@ -31,7 +31,7 @@ export function loadState(): AppState {
 }
 
 export function saveState(state: AppState): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch {
@@ -60,7 +60,7 @@ export function completeSession(state: AppState, id: string): AppState {
   return {
     ...state,
     sessions: state.sessions.map((s) =>
-      s.id === id ? { ...s, completed: true, endTime: new Date().toISOString() } : s
+      s.id === id ? { ...s, completed: true, endTime: new Date().toISOString() } : s,
     ),
     pomodoroCount: state.pomodoroCount + 1,
   };
@@ -70,7 +70,7 @@ export function abandonSession(state: AppState, id: string): AppState {
   return {
     ...state,
     sessions: state.sessions.map((s) =>
-      s.id === id ? { ...s, endTime: new Date().toISOString() } : s
+      s.id === id ? { ...s, endTime: new Date().toISOString() } : s,
     ),
   };
 }
@@ -94,7 +94,7 @@ export function toggleDistraction(state: AppState, id: string): AppState {
   return {
     ...state,
     distractions: state.distractions.map((d) =>
-      d.id === id ? { ...d, resolved: !d.resolved } : d
+      d.id === id ? { ...d, resolved: !d.resolved } : d,
     ),
   };
 }
@@ -122,9 +122,7 @@ export function addTodo(state: AppState, todo: TodoItem): AppState {
 export function toggleTodo(state: AppState, id: string): AppState {
   return {
     ...state,
-    todos: state.todos.map((t) =>
-      t.id === id ? { ...t, completed: !t.completed } : t
-    ),
+    todos: state.todos.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)),
   };
 }
 

@@ -3,7 +3,7 @@
  * No external audio file required.
  */
 export function playCompletionSound(): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
   try {
     const ctx = new AudioContext();
 
@@ -17,7 +17,7 @@ export function playCompletionSound(): void {
       osc.connect(gain);
       gain.connect(ctx.destination);
 
-      osc.type = "sine";
+      osc.type = 'sine';
       osc.frequency.value = freq;
 
       const noteStart = startTime + i * 0.18;
@@ -39,7 +39,7 @@ export function playCompletionSound(): void {
  * Plays a short tick sound for each second (optional, disable if noisy).
  */
 export function playTickSound(): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
   try {
     const ctx = new AudioContext();
     const osc = ctx.createOscillator();
@@ -48,7 +48,7 @@ export function playTickSound(): void {
     osc.connect(gain);
     gain.connect(ctx.destination);
 
-    osc.type = "sine";
+    osc.type = 'sine';
     osc.frequency.value = 1000;
 
     gain.gain.setValueAtTime(0.05, ctx.currentTime);

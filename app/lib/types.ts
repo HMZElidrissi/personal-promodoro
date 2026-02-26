@@ -1,9 +1,9 @@
-export type TimerMode = "focus" | "short-break" | "long-break";
+export type TimerMode = 'focus' | 'short-break' | 'long-break';
 
 export interface TimerSettings {
-  focusDuration: number;      // minutes
+  focusDuration: number; // minutes
   shortBreakDuration: number; // minutes
-  longBreakDuration: number;  // minutes
+  longBreakDuration: number; // minutes
 }
 
 export const DEFAULT_SETTINGS: TimerSettings = {

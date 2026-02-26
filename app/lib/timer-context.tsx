@@ -1,14 +1,8 @@
-import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from "react";
-import { useTimer, TIMER_DURATIONS } from "./use-timer";
-import {
-  loadState,
-  saveState,
-  addSession,
-  completeSession,
-  abandonSession,
-} from "./storage";
-import { playCompletionSound } from "./sounds";
-import type { AppState, Session, TimerMode, TimerSettings } from "./types";
+import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
+import { useTimer, TIMER_DURATIONS } from './use-timer';
+import { loadState, saveState, addSession, completeSession, abandonSession } from './storage';
+import { playCompletionSound } from './sounds';
+import type { AppState, Session, TimerMode, TimerSettings } from './types';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -44,7 +38,7 @@ const TimerContext = createContext<TimerContextValue | null>(null);
 
 export function useTimerContext() {
   const ctx = useContext(TimerContext);
-  if (!ctx) throw new Error("useTimerContext must be used inside <TimerProvider>");
+  if (!ctx) throw new Error('useTimerContext must be used inside <TimerProvider>');
   return ctx;
 }
 
@@ -57,21 +51,18 @@ export function TimerProvider({ children }: { children: ReactNode }) {
 
   // Derive the focus topic from the first uncompleted todo
   const activeTodo = state.todos.find((t) => !t.completed);
-  const focusTopic = activeTodo?.text ?? "";
+  const focusTopic = activeTodo?.text ?? '';
 
   // Persist whenever state changes
   // Note: we do this inside handlers rather than an effect to avoid extra
   // renders, but a useEffect would also work — keeping parity with home.tsx.
-  const persistAndSet: React.Dispatch<React.SetStateAction<AppState>> = useCallback(
-    (action) => {
-      setState((prev) => {
-        const next = typeof action === "function" ? action(prev) : action;
-        saveState(next);
-        return next;
-      });
-    },
-    []
-  );
+  const persistAndSet: React.Dispatch<React.SetStateAction<AppState>> = useCallback((action) => {
+    setState((prev) => {
+      const next = typeof action === 'function' ? action(prev) : action;
+      saveState(next);
+      return next;
+    });
+  }, []);
 
   const handleComplete = useCallback(
     (completedMode: TimerMode) => {
@@ -79,36 +70,46 @@ export function TimerProvider({ children }: { children: ReactNode }) {
       setJustCompleted(true);
       setTimeout(() => setJustCompleted(false), 3000);
 
-      if (completedMode === "focus" && currentSessionId) {
+      if (completedMode === 'focus' && currentSessionId) {
         persistAndSet((prev) => completeSession(prev, currentSessionId));
         setCurrentSessionId(null);
       }
 
-      if (typeof Notification !== "undefined" && Notification.permission === "granted") {
-        new Notification("Personal Pomodoro", {
+      if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+        new Notification('Personal Pomodoro', {
           body:
-            completedMode === "focus"
-              ? "🍅 Focus session complete! Time for a break."
-              : "☕ Break over — back to work!",
-          icon: "/favicon.ico",
+            completedMode === 'focus'
+              ? '🍅 Focus session complete! Time for a break.'
+              : '☕ Break over — back to work!',
+          icon: '/favicon.ico',
         });
       }
     },
-    [currentSessionId, persistAndSet]
+    [currentSessionId, persistAndSet],
   );
 
   // Derive durations (in seconds) from persisted settings
   const durations = useMemo(
     () => ({
       focus: state.settings.focusDuration * 60,
-      "short-break": state.settings.shortBreakDuration * 60,
-      "long-break": state.settings.longBreakDuration * 60,
+      'short-break': state.settings.shortBreakDuration * 60,
+      'long-break': state.settings.longBreakDuration * 60,
     }),
-    [state.settings]
+    [state.settings],
   );
 
-  const { mode, secondsLeft, isRunning, progress, totalSeconds, start, pause, reset, switchMode, formatTime } =
-    useTimer({ onComplete: handleComplete, durations });
+  const {
+    mode,
+    secondsLeft,
+    isRunning,
+    progress,
+    totalSeconds,
+    start,
+    pause,
+    reset,
+    switchMode,
+    formatTime,
+  } = useTimer({ onComplete: handleComplete, durations });
 
   const updateSettings = useCallback(
     (patch: Partial<TimerSettings>) => {
@@ -117,24 +118,24 @@ export function TimerProvider({ children }: { children: ReactNode }) {
         settings: { ...prev.settings, ...patch },
       }));
     },
-    [persistAndSet]
+    [persistAndSet],
   );
 
   const handleStart = useCallback(() => {
-    if (mode === "focus" && !currentSessionId) {
+    if (mode === 'focus' && !currentSessionId) {
       const session: Session = {
         id: crypto.randomUUID(),
-        focusTopic: focusTopic.trim() || "Untitled session",
+        focusTopic: focusTopic.trim() || 'Untitled session',
         startTime: new Date().toISOString(),
         endTime: null,
         completed: false,
-        mode: "focus",
+        mode: 'focus',
       };
       persistAndSet((prev) => addSession(prev, session));
       setCurrentSessionId(session.id);
     }
     start();
-    if (typeof Notification !== "undefined" && Notification.permission === "default") {
+    if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
       Notification.requestPermission();
     }
   }, [mode, currentSessionId, focusTopic, start, persistAndSet]);
@@ -155,7 +156,7 @@ export function TimerProvider({ children }: { children: ReactNode }) {
       }
       switchMode(newMode);
     },
-    [currentSessionId, switchMode, persistAndSet]
+    [currentSessionId, switchMode, persistAndSet],
   );
 
   return (

@@ -1,39 +1,42 @@
-import { useState } from "react";
-import { Layout } from "@/components/app-layout";
-import { useTimerContext } from "@/lib/timer-context";
-import { clearSessions } from "@/lib/storage";
-import type { Session } from "@/lib/types";
-import { Button } from "@/components/ui/button";
-import { CheckCircle2, XCircle, Clock, Flame, CalendarDays, Eraser } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { useState } from 'react';
+import { Layout } from '@/components/app-layout';
+import { useTimerContext } from '@/lib/timer-context';
+import { clearSessions } from '@/lib/storage';
+import type { Session } from '@/lib/types';
+import { Button } from '@/components/ui/button';
+import { CheckCircle2, XCircle, Clock, Flame, CalendarDays, Eraser } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 
 export function meta() {
   return [
-    { title: "History — Personal Pomodoro" },
-    { name: "description", content: "Your Pomodoro session history — see what you've accomplished." },
+    { title: 'History — Personal Pomodoro' },
+    {
+      name: 'description',
+      content: "Your Pomodoro session history — see what you've accomplished.",
+    },
   ];
 }
 
 function formatDuration(startTime: string, endTime: string | null): string {
-  if (!endTime) return "ongoing";
+  if (!endTime) return 'ongoing';
   const ms = new Date(endTime).getTime() - new Date(startTime).getTime();
   const minutes = Math.floor(ms / 60000);
-  if (minutes < 1) return "<1 min";
+  if (minutes < 1) return '<1 min';
   return `${minutes} min`;
 }
 
 function formatDateHeading(dateStr: string): string {
-  const date = new Date(dateStr + "T00:00:00");
+  const date = new Date(dateStr + 'T00:00:00');
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
 
-  if (date.getTime() === today.getTime()) return "Today";
-  if (date.getTime() === yesterday.getTime()) return "Yesterday";
-  return date.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+  if (date.getTime() === today.getTime()) return 'Today';
+  if (date.getTime() === yesterday.getTime()) return 'Yesterday';
+  return date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 }
 
 function groupByDate(sessions: Session[]): Map<string, Session[]> {
@@ -50,7 +53,7 @@ export default function HistoryPage() {
   const { state, setState } = useTimerContext();
   const [confirmClear, setConfirmClear] = useState(false);
 
-  const sessions = state.sessions.filter((s) => s.mode === "focus");
+  const sessions = state.sessions.filter((s) => s.mode === 'focus');
   const grouped = groupByDate(sessions);
   const sortedDates = Array.from(grouped.keys()).sort((a, b) => b.localeCompare(a));
 
@@ -61,24 +64,24 @@ export default function HistoryPage() {
 
   return (
     <Layout>
-      <div className="flex flex-col gap-6 animate-slide-up">
+      <div className="animate-slide-up flex flex-col gap-6">
         {/* Header */}
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Session History</h1>
-            <p className="text-muted-foreground text-sm mt-1">
+            <p className="text-muted-foreground mt-1 text-sm">
               Your completed Pomodoro sessions over time.
             </p>
           </div>
-          {sessions.length > 0 && (
-            confirmClear ? (
-              <div className="flex items-center gap-2 animate-fade-in">
-                <span className="text-xs text-muted-foreground">Clear all sessions?</span>
+          {sessions.length > 0 &&
+            (confirmClear ? (
+              <div className="animate-fade-in flex items-center gap-2">
+                <span className="text-muted-foreground text-xs">Clear all sessions?</span>
                 <Button
                   id="btn-confirm-clear"
                   size="sm"
                   variant="destructive"
-                  className="h-7 text-xs gap-1.5"
+                  className="h-7 gap-1.5 text-xs"
                   onClick={() => {
                     setState((prev) => clearSessions(prev));
                     setConfirmClear(false);
@@ -91,7 +94,7 @@ export default function HistoryPage() {
                   id="btn-cancel-clear"
                   size="sm"
                   variant="outline"
-                  className="h-7 text-xs border-border/60"
+                  className="border-border/60 h-7 text-xs"
                   onClick={() => setConfirmClear(false)}
                 >
                   Cancel
@@ -108,14 +111,13 @@ export default function HistoryPage() {
                 <Eraser className="size-3.5" />
                 Clear all
               </Button>
-            )
-          )}
+            ))}
         </div>
 
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-3">
           <StatCard
-            icon={<Flame className="size-4 text-primary" />}
+            icon={<Flame className="text-primary size-4" />}
             value={streak}
             label="Day streak"
             accent="primary"
@@ -145,14 +147,11 @@ export default function HistoryPage() {
 
               return (
                 <section key={dateStr}>
-                  <div className="flex items-center justify-between mb-3">
-                    <h2 className="font-semibold text-sm text-foreground/80">
+                  <div className="mb-3 flex items-center justify-between">
+                    <h2 className="text-foreground/80 text-sm font-semibold">
                       {formatDateHeading(dateStr)}
                     </h2>
-                    <Badge
-                      variant="secondary"
-                      className="text-xs bg-muted/60"
-                    >
+                    <Badge variant="secondary" className="bg-muted/60 text-xs">
                       {dayCompleted}/{daySessions.length} completed
                     </Badge>
                   </div>
@@ -161,7 +160,7 @@ export default function HistoryPage() {
                       <SessionCard key={session.id} session={session} />
                     ))}
                   </div>
-                  <Separator className="mt-6 bg-border/30" />
+                  <Separator className="bg-border/30 mt-6" />
                 </section>
               );
             })}
@@ -181,24 +180,19 @@ function StatCard({
   icon: React.ReactNode;
   value: number;
   label: string;
-  accent: "primary" | "emerald" | "blue";
+  accent: 'primary' | 'emerald' | 'blue';
 }) {
   const bg = {
-    primary: "border-primary/20 bg-primary/5",
-    emerald: "border-emerald-500/20 bg-emerald-500/5",
-    blue: "border-blue-400/20 bg-blue-400/5",
+    primary: 'border-primary/20 bg-primary/5',
+    emerald: 'border-emerald-500/20 bg-emerald-500/5',
+    blue: 'border-blue-400/20 bg-blue-400/5',
   }[accent];
 
   return (
-    <div
-      className={cn(
-        "glass rounded-2xl p-4 flex flex-col items-center gap-2 border",
-        bg
-      )}
-    >
+    <div className={cn('glass flex flex-col items-center gap-2 rounded-2xl border p-4', bg)}>
       {icon}
       <div className="text-2xl font-bold tabular-nums">{value}</div>
-      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="text-muted-foreground text-xs">{label}</div>
     </div>
   );
 }
@@ -207,27 +201,26 @@ function SessionCard({ session }: { session: Session }) {
   return (
     <div
       className={cn(
-        "glass rounded-xl px-4 py-3 flex items-center gap-3 transition-all duration-200 hover:bg-muted/20",
-        !session.completed && "opacity-60"
+        'glass hover:bg-muted/20 flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200',
+        !session.completed && 'opacity-60',
       )}
     >
       {session.completed ? (
-        <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
+        <CheckCircle2 className="size-4 shrink-0 text-emerald-400" />
       ) : (
-        <XCircle className="size-4 text-destructive/60 shrink-0" />
+        <XCircle className="text-destructive/60 size-4 shrink-0" />
       )}
 
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">{session.focusTopic}</p>
-        <div className="flex items-center gap-1.5 mt-0.5">
-          <Clock className="size-3 text-muted-foreground" />
-          <span className="text-xs text-muted-foreground">
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium">{session.focusTopic}</p>
+        <div className="mt-0.5 flex items-center gap-1.5">
+          <Clock className="text-muted-foreground size-3" />
+          <span className="text-muted-foreground text-xs">
             {new Date(session.startTime).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
+              hour: '2-digit',
+              minute: '2-digit',
             })}
-            {session.endTime &&
-              ` · ${formatDuration(session.startTime, session.endTime)}`}
+            {session.endTime && ` · ${formatDuration(session.startTime, session.endTime)}`}
           </span>
         </div>
       </div>
@@ -235,13 +228,13 @@ function SessionCard({ session }: { session: Session }) {
       <Badge
         variant="secondary"
         className={cn(
-          "text-xs shrink-0",
+          'shrink-0 text-xs',
           session.completed
-            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-            : "bg-destructive/10 text-destructive border-destructive/20"
+            ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400'
+            : 'bg-destructive/10 text-destructive border-destructive/20',
         )}
       >
-        {session.completed ? "Done" : "Abandoned"}
+        {session.completed ? 'Done' : 'Abandoned'}
       </Badge>
     </div>
   );
@@ -249,12 +242,12 @@ function SessionCard({ session }: { session: Session }) {
 
 function EmptyState() {
   return (
-    <div className="glass rounded-2xl p-12 flex flex-col items-center gap-3 text-center">
-      <div className="size-12 rounded-2xl bg-primary/10 flex items-center justify-center">
-        <Clock className="size-6 text-primary" />
+    <div className="glass flex flex-col items-center gap-3 rounded-2xl p-12 text-center">
+      <div className="bg-primary/10 flex size-12 items-center justify-center rounded-2xl">
+        <Clock className="text-primary size-6" />
       </div>
       <h3 className="font-semibold">No sessions yet</h3>
-      <p className="text-sm text-muted-foreground max-w-xs">
+      <p className="text-muted-foreground max-w-xs text-sm">
         Start your first Pomodoro session on the timer page. Your history will appear here.
       </p>
     </div>

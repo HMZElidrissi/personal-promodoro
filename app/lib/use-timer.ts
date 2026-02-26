@@ -1,16 +1,16 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import type { TimerMode } from "./types";
+import { useState, useEffect, useRef, useCallback } from 'react';
+import type { TimerMode } from './types';
 
 export const TIMER_DURATIONS: Record<TimerMode, number> = {
   focus: 25 * 60,
-  "short-break": 5 * 60,
-  "long-break": 15 * 60,
+  'short-break': 5 * 60,
+  'long-break': 15 * 60,
 };
 
 export const MODE_LABELS: Record<TimerMode, string> = {
-  focus: "Focus",
-  "short-break": "Short Break",
-  "long-break": "Long Break",
+  focus: 'Focus',
+  'short-break': 'Short Break',
+  'long-break': 'Long Break',
 };
 
 interface UseTimerOptions {
@@ -20,15 +20,15 @@ interface UseTimerOptions {
 }
 
 export function useTimer({ onComplete, durations }: UseTimerOptions = {}) {
-  const [mode, setMode] = useState<TimerMode>("focus");
+  const [mode, setMode] = useState<TimerMode>('focus');
   const [isRunning, setIsRunning] = useState(false);
 
   const getDuration = useCallback(
     (m: TimerMode) => durations?.[m] ?? TIMER_DURATIONS[m],
-    [durations]
+    [durations],
   );
 
-  const [secondsLeft, setSecondsLeft] = useState(() => getDuration("focus"));
+  const [secondsLeft, setSecondsLeft] = useState(() => getDuration('focus'));
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const onCompleteRef = useRef(onComplete);
@@ -96,12 +96,14 @@ export function useTimer({ onComplete, durations }: UseTimerOptions = {}) {
       setMode(newMode);
       setSecondsLeft(getDuration(newMode));
     },
-    [clearTimer, getDuration]
+    [clearTimer, getDuration],
   );
 
   const formatTime = useCallback((seconds: number) => {
-    const m = Math.floor(seconds / 60).toString().padStart(2, "0");
-    const s = (seconds % 60).toString().padStart(2, "0");
+    const m = Math.floor(seconds / 60)
+      .toString()
+      .padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
     return `${m}:${s}`;
   }, []);
 

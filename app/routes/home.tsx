@@ -1,32 +1,32 @@
-import { useState, useCallback, useEffect, useRef } from "react";
-import { Layout } from "@/components/app-layout";
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { Layout } from '@/components/app-layout';
 import {
   CircularProgress,
   CircularProgressIndicator,
   CircularProgressTrack,
   CircularProgressRange,
-} from "@/components/ui/circular-progress";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+} from '@/components/ui/circular-progress';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 import {
   Play,
   Pause,
   RotateCcw,
   Plus,
-  Trash2,
+  X,
   Coffee,
   Zap,
   Moon,
   CheckCircle2,
   Clock,
   ListChecks,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { TIMER_DURATIONS, MODE_LABELS } from "@/lib/use-timer";
-import { useTimerContext } from "@/lib/timer-context";
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { TIMER_DURATIONS, MODE_LABELS } from '@/lib/use-timer';
+import { useTimerContext } from '@/lib/timer-context';
 import {
   addDistraction,
   toggleDistraction,
@@ -35,8 +35,8 @@ import {
   addTodo,
   toggleTodo,
   deleteTodo,
-} from "@/lib/storage";
-import type { Distraction, TimerMode, TodoItem } from "@/lib/types";
+} from '@/lib/storage';
+import type { Distraction, TimerMode, TodoItem } from '@/lib/types';
 
 const MODE_CONFIG: Record<
   TimerMode,
@@ -50,38 +50,38 @@ const MODE_CONFIG: Record<
   }
 > = {
   focus: {
-    trackClass: "text-primary/10",
-    rangeClass: "text-primary",
-    glowClass: "glow-primary",
-    bgAccent: "bg-primary/5 border-primary/20",
+    trackClass: 'text-primary/10',
+    rangeClass: 'text-primary',
+    glowClass: 'glow-primary',
+    bgAccent: 'bg-primary/5 border-primary/20',
     icon: <Zap className="size-4" />,
-    label: "Focus",
+    label: 'Focus',
   },
-  "short-break": {
-    trackClass: "text-emerald-500/10",
-    rangeClass: "text-emerald-500",
-    glowClass: "glow-break",
-    bgAccent: "bg-emerald-500/5 border-emerald-500/20",
+  'short-break': {
+    trackClass: 'text-emerald-500/10',
+    rangeClass: 'text-emerald-500',
+    glowClass: 'glow-break',
+    bgAccent: 'bg-emerald-500/5 border-emerald-500/20',
     icon: <Coffee className="size-4" />,
-    label: "Short Break",
+    label: 'Short Break',
   },
-  "long-break": {
-    trackClass: "text-blue-400/10",
-    rangeClass: "text-blue-400",
-    glowClass: "glow-long-break",
-    bgAccent: "bg-blue-400/5 border-blue-400/20",
+  'long-break': {
+    trackClass: 'text-blue-400/10',
+    rangeClass: 'text-blue-400',
+    glowClass: 'glow-long-break',
+    bgAccent: 'bg-blue-400/5 border-blue-400/20',
     icon: <Moon className="size-4" />,
-    label: "Long Break",
+    label: 'Long Break',
   },
 };
 
 export function meta() {
   return [
-    { title: "Personal Pomodoro" },
+    { title: 'Personal Pomodoro' },
     {
-      name: "description",
+      name: 'description',
       content:
-        "Stay focused with the Pomodoro technique. Track your sessions and capture distractions.",
+        'Stay focused with the Pomodoro technique. Track your sessions and capture distractions.',
     },
   ];
 }
@@ -102,8 +102,8 @@ export default function HomePage() {
     handleSwitchMode,
   } = useTimerContext();
 
-  const [todoInput, setTodoInput] = useState("");
-  const [distractionInput, setDistractionInput] = useState("");
+  const [todoInput, setTodoInput] = useState('');
+  const [distractionInput, setDistractionInput] = useState('');
   const distractionInputRef = useRef<HTMLInputElement>(null);
   const todoInputRef = useRef<HTMLInputElement>(null);
 
@@ -117,7 +117,7 @@ export default function HomePage() {
       completed: false,
     };
     setState((prev) => addTodo(prev, todo));
-    setTodoInput("");
+    setTodoInput('');
   }, [todoInput, setState]);
 
   const handleAddDistraction = useCallback(() => {
@@ -130,7 +130,7 @@ export default function HomePage() {
       resolved: false,
     };
     setState((prev) => addDistraction(prev, d));
-    setDistractionInput("");
+    setDistractionInput('');
   }, [distractionInput, setState]);
 
   // displayMode = the tab the user is viewing (may differ from the running mode)
@@ -146,8 +146,16 @@ export default function HomePage() {
   // What the timer ring / countdown should show:
   // - Viewing the active mode → show live countdown & progress
   // - Viewing a different mode → show its full duration (fresh preview)
-  const displaySeconds   = isViewingRunningMode ? secondsLeft : (state.settings[displayMode === "focus" ? "focusDuration" : displayMode === "short-break" ? "shortBreakDuration" : "longBreakDuration"] * 60);
-  const displayProgress  = isViewingRunningMode ? progress : 0;
+  const displaySeconds = isViewingRunningMode
+    ? secondsLeft
+    : state.settings[
+        displayMode === 'focus'
+          ? 'focusDuration'
+          : displayMode === 'short-break'
+            ? 'shortBreakDuration'
+            : 'longBreakDuration'
+      ] * 60;
+  const displayProgress = isViewingRunningMode ? progress : 0;
 
   const todaySessions = getTodaySessions(state);
   const completedToday = todaySessions.filter((s) => s.completed).length;
@@ -156,10 +164,10 @@ export default function HomePage() {
 
   return (
     <Layout>
-      <div className="flex flex-col gap-6 animate-slide-up">
+      <div className="animate-slide-up flex flex-col gap-6">
         {/* ── Mode selector ── */}
         <div className="flex items-center justify-center gap-2">
-          {(["focus", "short-break", "long-break"] as TimerMode[]).map((m) => {
+          {(['focus', 'short-break', 'long-break'] as TimerMode[]).map((m) => {
             const cfg = MODE_CONFIG[m];
             const isActiveRunning = m === mode && isRunning;
             return (
@@ -168,17 +176,17 @@ export default function HomePage() {
                 id={`mode-${m}`}
                 onClick={() => setDisplayMode(m)}
                 className={cn(
-                  "relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
+                  'relative flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition-all duration-300',
                   displayMode === m
-                    ? `${cfg.bgAccent} border text-foreground shadow-sm`
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent border border-transparent"
+                    ? `${cfg.bgAccent} text-foreground border shadow-sm`
+                    : 'text-muted-foreground hover:text-foreground hover:bg-accent border border-transparent',
                 )}
               >
                 {cfg.icon}
                 {cfg.label}
                 {/* Pulsing dot to indicate this mode is actively running */}
                 {isActiveRunning && displayMode !== m && (
-                  <span className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-primary animate-pulse" />
+                  <span className="bg-primary absolute -top-0.5 -right-0.5 size-2 animate-pulse rounded-full" />
                 )}
               </button>
             );
@@ -188,43 +196,46 @@ export default function HomePage() {
         {/* ── Main timer card ── */}
         <div
           className={cn(
-            "glass rounded-3xl p-8 flex flex-col items-center gap-8 transition-all duration-500",
-            displayConfig.glowClass
+            'glass flex flex-col items-center gap-8 rounded-3xl p-8 transition-all duration-500',
+            displayConfig.glowClass,
           )}
         >
           {/* Round indicator */}
           <div className="flex items-center gap-1.5">
-            <span className="text-xs text-muted-foreground font-medium">Round</span>
+            <span className="text-muted-foreground text-xs font-medium">Round</span>
             <div className="flex gap-1">
               {[1, 2, 3, 4].map((n) => (
                 <div
                   key={n}
                   className={cn(
-                    "size-2 rounded-full transition-all duration-300",
-                    n <= pomodoroRound && mode === "focus" && isRunning
-                      ? "bg-primary"
+                    'size-2 rounded-full transition-all duration-300',
+                    n <= pomodoroRound && mode === 'focus' && isRunning
+                      ? 'bg-primary'
                       : n < pomodoroRound
-                      ? "bg-primary/80"
-                      : "bg-muted"
+                        ? 'bg-primary/80'
+                        : 'bg-muted',
                   )}
                 />
               ))}
             </div>
-            <span className="text-xs text-muted-foreground">
-              {completedToday} completed today
-            </span>
+            <span className="text-muted-foreground text-xs">{completedToday} completed today</span>
           </div>
 
           {/* Running-in-background notice */}
           {!isViewingRunningMode && isRunning && (
-            <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/30 px-3 py-1.5 rounded-full border border-border/40 animate-fade-in">
-              <span className="size-1.5 rounded-full bg-primary animate-pulse" />
+            <div className="text-muted-foreground bg-muted/30 border-border/40 animate-fade-in flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs">
+              <span className="bg-primary size-1.5 animate-pulse rounded-full" />
               {MODE_LABELS[mode]} running — {formatTime(secondsLeft)} left
             </div>
           )}
 
           {/* Timer ring */}
-          <div className={cn("relative", justCompleted && isViewingRunningMode && "animate-pulse-ring")}>
+          <div
+            className={cn(
+              'relative',
+              justCompleted && isViewingRunningMode && 'animate-pulse-ring',
+            )}
+          >
             <CircularProgress
               value={displayProgress}
               max={100}
@@ -235,16 +246,16 @@ export default function HomePage() {
               <CircularProgressIndicator>
                 <CircularProgressTrack className={displayConfig.trackClass} />
                 <CircularProgressRange
-                  className={cn(displayConfig.rangeClass, "transition-all duration-1000")}
+                  className={cn(displayConfig.rangeClass, 'transition-all duration-1000')}
                 />
               </CircularProgressIndicator>
 
               {/* Center content */}
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
-                <div className="text-5xl font-bold tabular-nums tracking-tighter leading-none">
+                <div className="text-5xl leading-none font-bold tracking-tighter tabular-nums">
                   {formatTime(displaySeconds)}
                 </div>
-                <div className="flex items-center gap-1 text-muted-foreground text-xs font-medium mt-1">
+                <div className="text-muted-foreground mt-1 flex items-center gap-1 text-xs font-medium">
                   <Clock className="size-3" />
                   {MODE_LABELS[displayMode]}
                 </div>
@@ -259,11 +270,10 @@ export default function HomePage() {
               variant="ghost"
               size="icon"
               onClick={handleReset}
-              className="size-10 rounded-full hover:bg-destructive/10 hover:text-destructive"
+              className="hover:bg-destructive/10 hover:text-destructive size-10 rounded-full"
             >
               <RotateCcw className="size-4" />
             </Button>
-
             <Button
               id="btn-start-pause"
               onClick={() => {
@@ -277,46 +287,51 @@ export default function HomePage() {
               }}
               size="lg"
               className={cn(
-                "px-10 rounded-full font-semibold text-base transition-all duration-300",
-                displayMode === "focus"
-                  ? "bg-primary hover:bg-primary/90 shadow-lg shadow-primary/30"
-                  : displayMode === "short-break"
-                  ? "bg-emerald-500 hover:bg-emerald-500/90 shadow-lg shadow-emerald-500/30 text-white"
-                  : "bg-blue-400 hover:bg-blue-400/90 shadow-lg shadow-blue-400/30 text-white"
+                'rounded-full px-10 text-base font-semibold transition-all duration-300',
+                displayMode === 'focus'
+                  ? 'bg-primary hover:bg-primary/90 shadow-primary/30 shadow-lg'
+                  : displayMode === 'short-break'
+                    ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 hover:bg-emerald-500/90'
+                    : 'bg-blue-400 text-white shadow-lg shadow-blue-400/30 hover:bg-blue-400/90',
               )}
             >
               {isViewingRunningMode && isRunning ? (
-                <><Pause className="size-5 mr-2" /> Pause</>
+                <>
+                  <Pause className="mr-2 size-5" /> Pause
+                </>
               ) : isViewingRunningMode && secondsLeft < TIMER_DURATIONS[mode] ? (
-                <><Play className="size-5 mr-2" /> Resume</>
+                <>
+                  <Play className="mr-2 size-5" /> Resume
+                </>
               ) : (
-                <><Play className="size-5 mr-2" /> Start</>
+                <>
+                  <Play className="mr-2 size-5" /> Start
+                </>
               )}
             </Button>
-
             <div className="size-10" /> {/* spacer */}
           </div>
 
           {/* Completion message */}
           {justCompleted && (
-            <div className="flex items-center gap-2 text-sm font-medium text-emerald-400 animate-slide-up">
+            <div className="animate-slide-up flex items-center gap-2 text-sm font-medium text-emerald-400">
               <CheckCircle2 className="size-4" />
-              {mode === "focus" ? "Great work! Take a break." : "Break done — let's focus!"}
+              {mode === 'focus' ? 'Great work! Take a break.' : "Break done — let's focus!"}
             </div>
           )}
         </div>
 
         {/* ── Focus topic + Today's history ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {/* Focus topic → Todo list */}
-          <div className="glass rounded-2xl p-5 flex flex-col gap-4">
+          <div className="glass flex flex-col gap-4 rounded-2xl p-5">
             <div className="flex items-center gap-2">
-              <Zap className="size-4 text-primary" />
-              <h2 className="font-semibold text-sm">What are you focusing on?</h2>
+              <Zap className="text-primary size-4" />
+              <h2 className="text-sm font-semibold">What are you focusing on?</h2>
               {state.todos.filter((t) => !t.completed).length > 0 && (
                 <Badge
                   variant="secondary"
-                  className="ml-auto text-xs bg-primary/10 text-primary border-primary/20"
+                  className="bg-primary/10 text-primary border-primary/20 ml-auto text-xs"
                 >
                   {state.todos.filter((t) => !t.completed).length} left
                 </Badge>
@@ -331,7 +346,7 @@ export default function HomePage() {
                 placeholder="Add a task..."
                 value={todoInput}
                 onChange={(e) => setTodoInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleAddTodo()}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddTodo()}
                 className="bg-input/50 border-border/50 focus-visible:ring-primary/50"
               />
               <Button
@@ -340,16 +355,16 @@ export default function HomePage() {
                 variant="outline"
                 onClick={handleAddTodo}
                 disabled={!todoInput.trim()}
-                className="shrink-0 border-border/50 hover:bg-primary/10 hover:border-primary/30 hover:text-primary transition-colors"
+                className="border-border/50 hover:bg-primary/10 hover:border-primary/30 hover:text-primary shrink-0 transition-colors"
               >
                 <Plus className="size-4" />
               </Button>
             </div>
 
             {/* Todo list */}
-            <div className="flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-1">
+            <div className="flex max-h-48 flex-col gap-1.5 overflow-y-auto pr-1">
               {state.todos.length === 0 && (
-                <p className="text-xs text-muted-foreground text-center py-4">
+                <p className="text-muted-foreground py-4 text-center text-xs">
                   Add a task to get started 📝
                 </p>
               )}
@@ -357,33 +372,33 @@ export default function HomePage() {
                 <div
                   key={t.id}
                   className={cn(
-                    "flex items-center gap-2 text-xs rounded-lg px-3 py-2 transition-all duration-300",
+                    'flex items-center gap-2 rounded-lg px-3 py-2 text-xs transition-all duration-300',
                     t.completed
-                      ? "bg-muted/20 opacity-60 todo-completed"
+                      ? 'bg-muted/20 todo-completed opacity-60'
                       : idx === 0
-                      ? "bg-primary/10 border border-primary/20"
-                      : "bg-muted/40"
+                        ? 'bg-primary/10 border-primary/20 border'
+                        : 'bg-muted/40',
                   )}
                 >
                   <Checkbox
                     id={`todo-${t.id}`}
                     checked={t.completed}
                     onCheckedChange={() => setState((prev) => toggleTodo(prev, t.id))}
-                    className="size-3.5 border-border/60 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500 transition-all duration-200"
+                    className="border-border/60 size-3.5 transition-all duration-200 data-[state=checked]:border-emerald-500 data-[state=checked]:bg-emerald-500"
                   />
                   <span
                     className={cn(
-                      "flex-1 truncate transition-colors duration-250",
-                      t.completed ? "todo-strike text-muted-foreground" : "text-foreground/90"
+                      'flex-1 truncate transition-colors duration-250',
+                      t.completed ? 'todo-strike text-muted-foreground' : 'text-foreground/90',
                     )}
                   >
                     {t.text}
                   </span>
                   <button
                     onClick={() => setState((prev) => deleteTodo(prev, t.id))}
-                    className="text-muted-foreground/40 hover:text-destructive transition-colors shrink-0"
+                    className="text-muted-foreground/40 hover:text-destructive shrink-0 transition-colors"
                   >
-                    <Trash2 className="size-3" />
+                    <X className="size-4" />
                   </button>
                 </div>
               ))}
@@ -393,25 +408,23 @@ export default function HomePage() {
             {completedToday > 0 && (
               <>
                 <Separator className="bg-border/40" />
-                <div className="flex flex-col gap-1.5 max-h-32 overflow-y-auto pr-1">
-                  <p className="text-xs font-medium text-muted-foreground mb-1">
-                    Today's sessions
-                  </p>
+                <div className="flex max-h-32 flex-col gap-1.5 overflow-y-auto pr-1">
+                  <p className="text-muted-foreground mb-1 text-xs font-medium">Today's sessions</p>
                   {todaySessions
                     .filter((s) => s.completed)
                     .map((s, idx, arr) => (
                       <div
                         key={s.id}
-                        className="flex items-center gap-2 text-xs rounded-lg px-3 py-2 bg-emerald-500/5 border border-emerald-500/15 animate-fade-in"
+                        className="animate-fade-in flex items-center gap-2 rounded-lg border border-emerald-500/15 bg-emerald-500/5 px-3 py-2 text-xs"
                       >
-                        <CheckCircle2 className="size-3 text-emerald-400 shrink-0" />
-                        <span className="truncate text-foreground/80 flex-1">
+                        <CheckCircle2 className="size-3 shrink-0 text-emerald-400" />
+                        <span className="text-foreground/80 flex-1 truncate">
                           Session {arr.length - idx}
                         </span>
                         <span className="text-muted-foreground/60 shrink-0">
                           {new Date(s.startTime).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
+                            hour: '2-digit',
+                            minute: '2-digit',
                           })}
                         </span>
                       </div>
@@ -422,16 +435,16 @@ export default function HomePage() {
           </div>
 
           {/* Distraction capture */}
-          <div className="glass rounded-2xl p-5 flex flex-col gap-4">
+          <div className="glass flex flex-col gap-4 rounded-2xl p-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <ListChecks className="size-4 text-amber-400" />
-                <h2 className="font-semibold text-sm">Parking Lot</h2>
+                <h2 className="text-sm font-semibold">Parking Lot</h2>
               </div>
               {pendingDistractions.length > 0 && (
                 <Badge
                   variant="secondary"
-                  className="text-xs bg-amber-400/10 text-amber-400 border-amber-400/20"
+                  className="border-amber-400/20 bg-amber-400/10 text-xs text-amber-400"
                 >
                   {pendingDistractions.length}
                 </Badge>
@@ -446,7 +459,7 @@ export default function HomePage() {
                 placeholder="Dump that thought here..."
                 value={distractionInput}
                 onChange={(e) => setDistractionInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleAddDistraction()}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddDistraction()}
                 className="bg-input/50 border-border/50 focus-visible:ring-amber-400/50"
               />
               <Button
@@ -455,16 +468,16 @@ export default function HomePage() {
                 variant="outline"
                 onClick={handleAddDistraction}
                 disabled={!distractionInput.trim()}
-                className="shrink-0 border-border/50 hover:bg-amber-400/10 hover:border-amber-400/30 hover:text-amber-400 transition-colors"
+                className="border-border/50 shrink-0 transition-colors hover:border-amber-400/30 hover:bg-amber-400/10 hover:text-amber-400"
               >
                 <Plus className="size-4" />
               </Button>
             </div>
 
             {/* List (show latest 5 on home) */}
-            <div className="flex flex-col gap-1.5 max-h-44 overflow-y-auto pr-1">
+            <div className="flex max-h-44 flex-col gap-1.5 overflow-y-auto pr-1">
               {state.distractions.length === 0 && (
-                <p className="text-xs text-muted-foreground text-center py-4">
+                <p className="text-muted-foreground py-4 text-center text-xs">
                   Nothing here yet — stay focused! 🎯
                 </p>
               )}
@@ -472,36 +485,34 @@ export default function HomePage() {
                 <div
                   key={d.id}
                   className={cn(
-                    "flex items-center gap-2 text-xs rounded-lg px-3 py-2 transition-all duration-200",
-                    d.resolved ? "bg-muted/20 opacity-50" : "bg-muted/40"
+                    'flex items-center gap-2 rounded-lg px-3 py-2 text-xs transition-all duration-200',
+                    d.resolved ? 'bg-muted/20 opacity-50' : 'bg-muted/40',
                   )}
                 >
                   <Checkbox
                     id={`distraction-${d.id}`}
                     checked={d.resolved}
-                    onCheckedChange={() =>
-                      setState((prev) => toggleDistraction(prev, d.id))
-                    }
-                    className="size-3.5 border-border/60 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
+                    onCheckedChange={() => setState((prev) => toggleDistraction(prev, d.id))}
+                    className="border-border/60 size-3.5 data-[state=checked]:border-emerald-500 data-[state=checked]:bg-emerald-500"
                   />
                   <span
                     className={cn(
-                      "flex-1 truncate",
-                      d.resolved && "line-through text-muted-foreground"
+                      'flex-1 truncate',
+                      d.resolved && 'text-muted-foreground line-through',
                     )}
                   >
                     {d.text}
                   </span>
                   <button
                     onClick={() => setState((prev) => deleteDistraction(prev, d.id))}
-                    className="text-muted-foreground/40 hover:text-destructive transition-colors shrink-0"
+                    className="text-muted-foreground/40 hover:text-destructive shrink-0 transition-colors"
                   >
-                    <Trash2 className="size-3" />
+                    <X className="size-4" />
                   </button>
                 </div>
               ))}
               {state.distractions.length > 5 && (
-                <p className="text-xs text-muted-foreground text-center py-1">
+                <p className="text-muted-foreground py-1 text-center text-xs">
                   +{state.distractions.length - 5} more in Parking Lot
                 </p>
               )}
@@ -512,5 +523,3 @@ export default function HomePage() {
     </Layout>
   );
 }
-
-

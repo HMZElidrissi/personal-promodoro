@@ -82,7 +82,7 @@ const MODE_CONFIG: Record<
 
 export function meta() {
   return [
-    { title: "Focus Flow — Pomodoro Timer" },
+    { title: "Personal Pomodoro" },
     {
       name: "description",
       content:
@@ -99,10 +99,6 @@ export default function HomePage() {
   const [justCompleted, setJustCompleted] = useState(false);
   const distractionInputRef = useRef<HTMLInputElement>(null);
   const todoInputRef = useRef<HTMLInputElement>(null);
-
-  // Derive the focus topic from the first uncompleted todo
-  const activeTodo = state.todos.find((t) => !t.completed);
-  const focusTopic = activeTodo?.text ?? "";
 
   // Persist state changes
   useEffect(() => {
@@ -122,7 +118,7 @@ export default function HomePage() {
 
       // Browser notification
       if (typeof Notification !== "undefined" && Notification.permission === "granted") {
-        new Notification("Focus Flow", {
+        new Notification("Personal Pomodoro", {
           body:
             completedMode === "focus"
               ? "🍅 Focus session complete! Time for a break."
@@ -142,9 +138,10 @@ export default function HomePage() {
   const handleStart = useCallback(() => {
     // Start a new session record when focus starts
     if (mode === "focus" && !currentSessionId) {
+      const sessionNumber = state.sessions.length + 1;
       const session: Session = {
         id: crypto.randomUUID(),
-        focusTopic: focusTopic.trim() || "Untitled session",
+        focusTopic: `Session ${sessionNumber}`,
         startTime: new Date().toISOString(),
         endTime: null,
         completed: false,
@@ -158,7 +155,7 @@ export default function HomePage() {
     if (typeof Notification !== "undefined" && Notification.permission === "default") {
       Notification.requestPermission();
     }
-  }, [mode, currentSessionId, focusTopic, start]);
+  }, [mode, currentSessionId, state.sessions.length, start]);
 
   const handleReset = useCallback(() => {
     if (currentSessionId) {
@@ -393,23 +390,24 @@ export default function HomePage() {
                 <div
                   key={t.id}
                   className={cn(
-                    "flex items-center gap-2 text-xs rounded-lg px-3 py-2 transition-all duration-200",
-                    t.completed ? "bg-muted/20 opacity-50" : idx === 0 ? "bg-primary/10 border border-primary/20" : "bg-muted/40"
+                    "flex items-center gap-2 text-xs rounded-lg px-3 py-2 transition-all duration-300",
+                    t.completed
+                      ? "bg-muted/20 opacity-60 todo-completed"
+                      : idx === 0
+                      ? "bg-primary/10 border border-primary/20"
+                      : "bg-muted/40"
                   )}
                 >
-                  {idx === 0 && !t.completed && (
-                    <Zap className="size-3 text-primary shrink-0" />
-                  )}
                   <Checkbox
                     id={`todo-${t.id}`}
                     checked={t.completed}
                     onCheckedChange={() => setState((prev) => toggleTodo(prev, t.id))}
-                    className="size-3.5 border-border/60 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                    className="size-3.5 border-border/60 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500 transition-all duration-200"
                   />
                   <span
                     className={cn(
-                      "flex-1 truncate",
-                      t.completed && "line-through text-muted-foreground"
+                      "flex-1 truncate transition-colors duration-250",
+                      t.completed ? "todo-strike text-muted-foreground" : "text-foreground/90"
                     )}
                   >
                     {t.text}
@@ -424,35 +422,33 @@ export default function HomePage() {
               ))}
             </div>
 
-            {/* Today's sessions */}
-            {todaySessions.length > 0 && (
+            {/* Today's completed sessions */}
+            {completedToday > 0 && (
               <>
                 <Separator className="bg-border/40" />
                 <div className="flex flex-col gap-1.5 max-h-32 overflow-y-auto pr-1">
                   <p className="text-xs font-medium text-muted-foreground mb-1">
                     Today's sessions
                   </p>
-                  {todaySessions.map((s, idx) => (
-                    <div
-                      key={s.id}
-                      className="flex items-center gap-2 text-xs rounded-lg px-3 py-2 bg-muted/40"
-                    >
-                      {s.completed ? (
+                  {todaySessions
+                    .filter((s) => s.completed)
+                    .map((s, idx, arr) => (
+                      <div
+                        key={s.id}
+                        className="flex items-center gap-2 text-xs rounded-lg px-3 py-2 bg-emerald-500/5 border border-emerald-500/15 animate-fade-in"
+                      >
                         <CheckCircle2 className="size-3 text-emerald-400 shrink-0" />
-                      ) : (
-                        <div className="size-3 rounded-full border border-muted-foreground/40 shrink-0" />
-                      )}
-                      <span className="truncate text-foreground/80 flex-1">
-                        Session {todaySessions.length - idx}
-                      </span>
-                      <span className="text-muted-foreground/60 shrink-0">
-                        {new Date(s.startTime).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </span>
-                    </div>
-                  ))}
+                        <span className="truncate text-foreground/80 flex-1">
+                          Session {arr.length - idx}
+                        </span>
+                        <span className="text-muted-foreground/60 shrink-0">
+                          {new Date(s.startTime).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </div>
+                    ))}
                 </div>
               </>
             )}

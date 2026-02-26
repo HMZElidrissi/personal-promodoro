@@ -21,7 +21,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <Timer className="size-4 text-primary-foreground" />
             </div>
             <span className="font-semibold text-sm tracking-tight gradient-text">
-              Focus Flow
+              Personal Pomodoro
             </span>
           </div>
           <nav className="flex items-center gap-1">

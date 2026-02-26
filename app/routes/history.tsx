@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 
 export function meta() {
   return [
-    { title: "History — Focus Flow" },
+    { title: "History — Personal Pomodoro" },
     { name: "description", content: "Your Pomodoro session history — see what you've accomplished." },
   ];
 }

@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
 
 export function meta() {
   return [
-    { title: "Parking Lot — Focus Flow" },
+    { title: "Parking Lot — Personal Pomodoro" },
     {
       name: "description",
       content: "Manage distraction thoughts captured during focus sessions.",

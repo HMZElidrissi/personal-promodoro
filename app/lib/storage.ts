@@ -75,6 +75,10 @@ export function abandonSession(state: AppState, id: string): AppState {
   };
 }
 
+export function clearSessions(state: AppState): AppState {
+  return { ...state, sessions: [], pomodoroCount: 0 };
+}
+
 export function getTodaySessions(state: AppState): Session[] {
   const today = todayString();
   return state.sessions.filter((s) => s.startTime.slice(0, 10) === today);

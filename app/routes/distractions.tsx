@@ -38,6 +38,7 @@ export default function DistractionsPage() {
   const { state, setState } = useTimerContext();
   const [newText, setNewText] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
+  const [confirmClear, setConfirmClear] = useState(false);
 
   const persist = (updater: (prev: typeof state) => typeof state) => {
     setState(updater);
@@ -82,17 +83,59 @@ export default function DistractionsPage() {
               Thoughts that popped up during focus — handle them later.
             </p>
           </div>
-          {resolvedCount > 0 && (
-            <Button
-              id="btn-clear-resolved"
-              variant="ghost"
-              size="sm"
-              onClick={() => persist((prev) => clearResolvedDistractions(prev))}
-              className="text-muted-foreground hover:text-destructive gap-1.5 text-xs"
-            >
-              <Eraser className="size-3.5" />
-              Clear resolved
-            </Button>
+          {state.distractions.length > 0 && (
+            <div className="flex items-center gap-2">
+              {resolvedCount > 0 && !confirmClear && (
+                <Button
+                  id="btn-clear-resolved"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => persist((prev) => clearResolvedDistractions(prev))}
+                  className="text-muted-foreground hover:text-destructive gap-1.5 text-xs"
+                >
+                  <Eraser className="size-3.5" />
+                  Clear resolved
+                </Button>
+              )}
+              {confirmClear ? (
+                <div className="flex items-center gap-2 animate-fade-in">
+                  <span className="text-xs text-muted-foreground">Clear everything?</span>
+                  <Button
+                    id="btn-confirm-clear-all"
+                    size="sm"
+                    variant="destructive"
+                    className="h-7 text-xs gap-1.5"
+                    onClick={() => {
+                      persist((prev) => ({ ...prev, distractions: [] }));
+                      setConfirmClear(false);
+                    }}
+                  >
+                    <Eraser className="size-3" />
+                    Yes, clear
+                  </Button>
+                  <Button
+                    id="btn-cancel-clear-all"
+                    size="sm"
+                    variant="outline"
+                    className="h-7 text-xs border-border/60"
+                    onClick={() => setConfirmClear(false)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  id="btn-clear-all-distractions"
+                  size="sm"
+                  variant="ghost"
+                  className="text-muted-foreground hover:text-destructive gap-1.5 text-xs"
+                  onClick={() => setConfirmClear(true)}
+                >
+                  <Eraser className="size-3.5" />
+                  Clear all
+                </Button>
+              )}
+            </div>
           )}
         </div>
 

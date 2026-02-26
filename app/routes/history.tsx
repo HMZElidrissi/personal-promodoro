@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { Layout } from "@/components/app-layout";
 import { useTimerContext } from "@/lib/timer-context";
+import { clearSessions } from "@/lib/storage";
 import type { Session } from "@/lib/types";
-import { CheckCircle2, XCircle, Clock, Flame, CalendarDays } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CheckCircle2, XCircle, Clock, Flame, CalendarDays, Eraser } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -44,7 +47,8 @@ function groupByDate(sessions: Session[]): Map<string, Session[]> {
 }
 
 export default function HistoryPage() {
-  const { state } = useTimerContext();
+  const { state, setState } = useTimerContext();
+  const [confirmClear, setConfirmClear] = useState(false);
 
   const sessions = state.sessions.filter((s) => s.mode === "focus");
   const grouped = groupByDate(sessions);
@@ -59,11 +63,53 @@ export default function HistoryPage() {
     <Layout>
       <div className="flex flex-col gap-6 animate-slide-up">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Session History</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            Your completed Pomodoro sessions over time.
-          </p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Session History</h1>
+            <p className="text-muted-foreground text-sm mt-1">
+              Your completed Pomodoro sessions over time.
+            </p>
+          </div>
+          {sessions.length > 0 && (
+            confirmClear ? (
+              <div className="flex items-center gap-2 animate-fade-in">
+                <span className="text-xs text-muted-foreground">Clear all sessions?</span>
+                <Button
+                  id="btn-confirm-clear"
+                  size="sm"
+                  variant="destructive"
+                  className="h-7 text-xs gap-1.5"
+                  onClick={() => {
+                    setState((prev) => clearSessions(prev));
+                    setConfirmClear(false);
+                  }}
+                >
+                  <Eraser className="size-3" />
+                  Yes, clear
+                </Button>
+                <Button
+                  id="btn-cancel-clear"
+                  size="sm"
+                  variant="outline"
+                  className="h-7 text-xs border-border/60"
+                  onClick={() => setConfirmClear(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            ) : (
+              <Button
+                id="btn-clear-sessions"
+                size="sm"
+                variant="ghost"
+                className="text-muted-foreground hover:text-destructive gap-1.5 text-xs"
+                onClick={() => setConfirmClear(true)}
+              >
+                <Eraser className="size-3.5" />
+                Clear all
+              </Button>
+            )
+          )}
         </div>
 
         {/* Stats row */}

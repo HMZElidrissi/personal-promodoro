@@ -4,10 +4,19 @@ import { useTimerContext } from '@/lib/timer-context';
 import { clearSessions } from '@/lib/storage';
 import type { Session } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, XCircle, Clock, Flame, CalendarDays, Eraser } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock, Eraser } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import {
+  ContributionGraph,
+  ContributionGraphBlock,
+  ContributionGraphCalendar,
+  ContributionGraphFooter,
+  ContributionGraphLegend,
+  ContributionGraphTotalCount,
+  type Activity,
+} from '@/components/contribution-graph';
 
 export function meta() {
   return [
@@ -49,18 +58,46 @@ function groupByDate(sessions: Session[]): Map<string, Session[]> {
   return map;
 }
 
+/** Build Activity[] for the contribution graph from a per-day grouped map */
+function buildActivityData(grouped: Map<string, Session[]>): Activity[] {
+  if (grouped.size === 0) return [];
+
+  // Anchor the graph: start from 1 year ago, end today
+  const today = new Date();
+  const oneYearAgo = new Date(today);
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+  const startKey = oneYearAgo.toISOString().slice(0, 10);
+  const endKey = today.toISOString().slice(0, 10);
+
+  // Add anchor entries (empty) so the graph always spans a full year
+  const activities: Activity[] = [
+    { date: startKey, count: 0, level: 0 },
+    { date: endKey, count: 0, level: 0 },
+  ];
+
+  for (const [dateStr, daySessions] of grouped.entries()) {
+    const count = daySessions.filter((s) => s.completed).length;
+    if (count === 0) continue;
+    // Map count → level (1-4)
+    const level = count >= 6 ? 4 : count >= 4 ? 3 : count >= 2 ? 2 : 1;
+    activities.push({ date: dateStr, count, level });
+  }
+
+  return activities;
+}
+
 export default function HistoryPage() {
   const { state, setState } = useTimerContext();
   const [confirmClear, setConfirmClear] = useState(false);
 
-  const sessions = state.sessions.filter((s) => s.mode === 'focus');
+  // Exclude sessions still in progress (endTime === null) — they show as
+  // "Abandoned" even while the timer is actively running on another page.
+  const sessions = state.sessions.filter((s) => s.mode === 'focus' && s.endTime !== null);
   const grouped = groupByDate(sessions);
   const sortedDates = Array.from(grouped.keys()).sort((a, b) => b.localeCompare(a));
 
-  const totalCompleted = sessions.filter((s) => s.completed).length;
-  const today = new Date().toISOString().slice(0, 10);
-  const todayCompleted = (grouped.get(today) ?? []).filter((s) => s.completed).length;
-  const streak = computeStreak(grouped);
+  const contributionData = buildActivityData(grouped);
 
   return (
     <Layout>
@@ -114,27 +151,69 @@ export default function HistoryPage() {
             ))}
         </div>
 
-        {/* Stats row */}
-        <div className="grid grid-cols-3 gap-3">
-          <StatCard
-            icon={<Flame className="text-primary size-4" />}
-            value={streak}
-            label="Day streak"
-            accent="primary"
-          />
-          <StatCard
-            icon={<CheckCircle2 className="size-4 text-emerald-400" />}
-            value={totalCompleted}
-            label="All time"
-            accent="emerald"
-          />
-          <StatCard
-            icon={<CalendarDays className="size-4 text-blue-400" />}
-            value={todayCompleted}
-            label="Today"
-            accent="blue"
-          />
-        </div>
+        {/* Contribution graph */}
+        {contributionData.length > 0 && (
+          <div className="glass rounded-2xl border border-border/40 p-4">
+            <ContributionGraph
+              data={contributionData}
+              className="w-full"
+              blockSize={12}
+              blockRadius={3}
+              blockMargin={3}
+            >
+              <ContributionGraphCalendar className="w-full">
+                {({ activity, dayIndex, weekIndex }) => (
+                  <ContributionGraphBlock
+                    key={`${weekIndex}-${dayIndex}`}
+                    activity={activity}
+                    dayIndex={dayIndex}
+                    weekIndex={weekIndex}
+                    className={cn(
+                      'cursor-default transition-opacity hover:opacity-80',
+                      'data-[level="0"]:fill-muted',
+                      'data-[level="1"]:fill-emerald-200 dark:data-[level="1"]:fill-emerald-900',
+                      'data-[level="2"]:fill-emerald-400 dark:data-[level="2"]:fill-emerald-700',
+                      'data-[level="3"]:fill-emerald-500 dark:data-[level="3"]:fill-emerald-500',
+                      'data-[level="4"]:fill-emerald-600 dark:data-[level="4"]:fill-emerald-400',
+                    )}
+                  />
+                )}
+              </ContributionGraphCalendar>
+              <ContributionGraphFooter className="mt-2">
+                <ContributionGraphTotalCount className="text-muted-foreground text-xs">
+                  {({ totalCount, year }) => (
+                    <span className="text-muted-foreground text-xs">
+                      {totalCount} sessions completed in {year}
+                    </span>
+                  )}
+                </ContributionGraphTotalCount>
+                <ContributionGraphLegend className="ml-auto">
+                  {({ level }) => (
+                    <svg height={12} width={12}>
+                      <rect
+                        className={cn(
+                          'stroke-[1px] stroke-border',
+                          level === 0 && 'fill-muted',
+                          level === 1 &&
+                            'fill-emerald-200 dark:fill-emerald-900',
+                          level === 2 &&
+                            'fill-emerald-400 dark:fill-emerald-700',
+                          level === 3 && 'fill-emerald-500',
+                          level === 4 &&
+                            'fill-emerald-600 dark:fill-emerald-400',
+                        )}
+                        height={12}
+                        rx={2}
+                        ry={2}
+                        width={12}
+                      />
+                    </svg>
+                  )}
+                </ContributionGraphLegend>
+              </ContributionGraphFooter>
+            </ContributionGraph>
+          </div>
+        )}
 
         {/* Sessions list */}
         {sortedDates.length === 0 ? (
@@ -156,8 +235,12 @@ export default function HistoryPage() {
                     </Badge>
                   </div>
                   <div className="flex flex-col gap-2">
-                    {daySessions.map((session) => (
-                      <SessionCard key={session.id} session={session} />
+                    {daySessions.map((session, idx) => (
+                      <SessionCard
+                        key={session.id}
+                        session={session}
+                        index={daySessions.length - idx}
+                      />
                     ))}
                   </div>
                   <Separator className="bg-border/30 mt-6" />
@@ -171,33 +254,13 @@ export default function HistoryPage() {
   );
 }
 
-function StatCard({
-  icon,
-  value,
-  label,
-  accent,
-}: {
-  icon: React.ReactNode;
-  value: number;
-  label: string;
-  accent: 'primary' | 'emerald' | 'blue';
-}) {
-  const bg = {
-    primary: 'border-primary/20 bg-primary/5',
-    emerald: 'border-emerald-500/20 bg-emerald-500/5',
-    blue: 'border-blue-400/20 bg-blue-400/5',
-  }[accent];
+function SessionCard({ session, index }: { session: Session; index: number }) {
+  // Use todo topic when available, otherwise fall back to a numbered label
+  const title =
+    session.focusTopic && session.focusTopic !== 'Untitled session'
+      ? session.focusTopic
+      : `Session ${index}`;
 
-  return (
-    <div className={cn('glass flex flex-col items-center gap-2 rounded-2xl border p-4', bg)}>
-      {icon}
-      <div className="text-2xl font-bold tabular-nums">{value}</div>
-      <div className="text-muted-foreground text-xs">{label}</div>
-    </div>
-  );
-}
-
-function SessionCard({ session }: { session: Session }) {
   return (
     <div
       className={cn(
@@ -212,7 +275,7 @@ function SessionCard({ session }: { session: Session }) {
       )}
 
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">{session.focusTopic}</p>
+        <p className="truncate text-sm font-medium">{title}</p>
         <div className="mt-0.5 flex items-center gap-1.5">
           <Clock className="text-muted-foreground size-3" />
           <span className="text-muted-foreground text-xs">
@@ -252,22 +315,4 @@ function EmptyState() {
       </p>
     </div>
   );
-}
-
-/** Count the current daily streak (consecutive days with at least one completed session) */
-function computeStreak(grouped: Map<string, Session[]>): number {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  let streak = 0;
-  let current = new Date(today);
-
-  while (true) {
-    const dateStr = current.toISOString().slice(0, 10);
-    const daySessions = grouped.get(dateStr);
-    if (!daySessions || !daySessions.some((s) => s.completed)) break;
-    streak++;
-    current.setDate(current.getDate() - 1);
-  }
-
-  return streak;
 }

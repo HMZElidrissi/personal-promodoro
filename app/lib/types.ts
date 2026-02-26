@@ -1,5 +1,17 @@
 export type TimerMode = "focus" | "short-break" | "long-break";
 
+export interface TimerSettings {
+  focusDuration: number;      // minutes
+  shortBreakDuration: number; // minutes
+  longBreakDuration: number;  // minutes
+}
+
+export const DEFAULT_SETTINGS: TimerSettings = {
+  focusDuration: 25,
+  shortBreakDuration: 5,
+  longBreakDuration: 15,
+};
+
 export interface Session {
   id: string;
   focusTopic: string;
@@ -29,4 +41,5 @@ export interface AppState {
   todos: TodoItem[];
   pomodoroCount: number; // how many focus rounds completed today
   lastResetDate: string; // date string "YYYY-MM-DD" for daily reset logic
+  settings: TimerSettings;
 }

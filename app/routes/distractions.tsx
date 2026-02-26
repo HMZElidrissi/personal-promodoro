@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { Layout } from "@/components/app-layout";
+import { useTimerContext } from "@/lib/timer-context";
 import {
-  loadState,
-  saveState,
   toggleDistraction,
   deleteDistraction,
   clearResolvedDistractions,
   addDistraction,
 } from "@/lib/storage";
-import type { AppState, Distraction } from "@/lib/types";
+import type { Distraction } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -36,13 +35,12 @@ export function meta() {
 type Filter = "all" | "pending" | "resolved";
 
 export default function DistractionsPage() {
-  const [state, setState] = useState<AppState>(() => loadState());
+  const { state, setState } = useTimerContext();
   const [newText, setNewText] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
 
-  const persist = (next: AppState) => {
-    setState(next);
-    saveState(next);
+  const persist = (updater: (prev: typeof state) => typeof state) => {
+    setState(updater);
   };
 
   const handleAdd = () => {
@@ -54,7 +52,7 @@ export default function DistractionsPage() {
       createdAt: new Date().toISOString(),
       resolved: false,
     };
-    persist(addDistraction(state, d));
+    persist((prev) => addDistraction(prev, d));
     setNewText("");
   };
 
@@ -89,7 +87,7 @@ export default function DistractionsPage() {
               id="btn-clear-resolved"
               variant="ghost"
               size="sm"
-              onClick={() => persist(clearResolvedDistractions(state))}
+              onClick={() => persist((prev) => clearResolvedDistractions(prev))}
               className="text-muted-foreground hover:text-destructive gap-1.5 text-xs"
             >
               <Eraser className="size-3.5" />
@@ -188,8 +186,8 @@ export default function DistractionsPage() {
               <DistractionItem
                 key={d.id}
                 d={d}
-                onToggle={() => persist(toggleDistraction(state, d.id))}
-                onDelete={() => persist(deleteDistraction(state, d.id))}
+                onToggle={() => persist((prev) => toggleDistraction(prev, d.id))}
+                onDelete={() => persist((prev) => deleteDistraction(prev, d.id))}
               />
             ))
           )}

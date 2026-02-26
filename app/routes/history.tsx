@@ -1,6 +1,5 @@
-import { useState } from "react";
 import { Layout } from "@/components/app-layout";
-import { loadState } from "@/lib/storage";
+import { useTimerContext } from "@/lib/timer-context";
 import type { Session } from "@/lib/types";
 import { CheckCircle2, XCircle, Clock, Flame, CalendarDays } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -45,7 +44,7 @@ function groupByDate(sessions: Session[]): Map<string, Session[]> {
 }
 
 export default function HistoryPage() {
-  const [state] = useState(() => loadState());
+  const { state } = useTimerContext();
 
   const sessions = state.sessions.filter((s) => s.mode === "focus");
   const grouped = groupByDate(sessions);

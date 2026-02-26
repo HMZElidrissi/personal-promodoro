@@ -25,13 +25,9 @@ import {
   ListChecks,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useTimer, TIMER_DURATIONS, MODE_LABELS } from "@/lib/use-timer";
+import { TIMER_DURATIONS, MODE_LABELS } from "@/lib/use-timer";
+import { useTimerContext } from "@/lib/timer-context";
 import {
-  loadState,
-  saveState,
-  addSession,
-  completeSession,
-  abandonSession,
   addDistraction,
   toggleDistraction,
   deleteDistraction,
@@ -40,8 +36,7 @@ import {
   toggleTodo,
   deleteTodo,
 } from "@/lib/storage";
-import { playCompletionSound } from "@/lib/sounds";
-import type { AppState, Session, Distraction, TimerMode, TodoItem } from "@/lib/types";
+import type { Distraction, TimerMode, TodoItem } from "@/lib/types";
 
 const MODE_CONFIG: Record<
   TimerMode,
@@ -92,89 +87,25 @@ export function meta() {
 }
 
 export default function HomePage() {
-  const [state, setState] = useState<AppState>(() => loadState());
+  const {
+    mode,
+    secondsLeft,
+    isRunning,
+    progress,
+    formatTime,
+    pause,
+    state,
+    setState,
+    justCompleted,
+    handleStart,
+    handleReset,
+    handleSwitchMode,
+  } = useTimerContext();
+
   const [todoInput, setTodoInput] = useState("");
   const [distractionInput, setDistractionInput] = useState("");
-  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
-  const [justCompleted, setJustCompleted] = useState(false);
   const distractionInputRef = useRef<HTMLInputElement>(null);
   const todoInputRef = useRef<HTMLInputElement>(null);
-
-  // Persist state changes
-  useEffect(() => {
-    saveState(state);
-  }, [state]);
-
-  const handleComplete = useCallback(
-    (completedMode: TimerMode) => {
-      playCompletionSound();
-      setJustCompleted(true);
-      setTimeout(() => setJustCompleted(false), 3000);
-
-      if (completedMode === "focus" && currentSessionId) {
-        setState((prev) => completeSession(prev, currentSessionId));
-        setCurrentSessionId(null);
-      }
-
-      // Browser notification
-      if (typeof Notification !== "undefined" && Notification.permission === "granted") {
-        new Notification("Personal Pomodoro", {
-          body:
-            completedMode === "focus"
-              ? "🍅 Focus session complete! Time for a break."
-              : "☕ Break over — back to work!",
-          icon: "/favicon.ico",
-        });
-      }
-    },
-    [currentSessionId]
-  );
-
-  const { mode, secondsLeft, isRunning, progress, start, pause, reset, switchMode, formatTime } =
-    useTimer({ onComplete: handleComplete });
-
-  const config = MODE_CONFIG[mode];
-
-  const handleStart = useCallback(() => {
-    // Start a new session record when focus starts
-    if (mode === "focus" && !currentSessionId) {
-      const sessionNumber = state.sessions.length + 1;
-      const session: Session = {
-        id: crypto.randomUUID(),
-        focusTopic: `Session ${sessionNumber}`,
-        startTime: new Date().toISOString(),
-        endTime: null,
-        completed: false,
-        mode: "focus",
-      };
-      setState((prev) => addSession(prev, session));
-      setCurrentSessionId(session.id);
-    }
-    start();
-    // Request notification permission
-    if (typeof Notification !== "undefined" && Notification.permission === "default") {
-      Notification.requestPermission();
-    }
-  }, [mode, currentSessionId, state.sessions.length, start]);
-
-  const handleReset = useCallback(() => {
-    if (currentSessionId) {
-      setState((prev) => abandonSession(prev, currentSessionId));
-      setCurrentSessionId(null);
-    }
-    reset();
-  }, [currentSessionId, reset]);
-
-  const handleSwitchMode = useCallback(
-    (newMode: TimerMode) => {
-      if (currentSessionId) {
-        setState((prev) => abandonSession(prev, currentSessionId));
-        setCurrentSessionId(null);
-      }
-      switchMode(newMode);
-    },
-    [currentSessionId, switchMode]
-  );
 
   const handleAddTodo = useCallback(() => {
     const text = todoInput.trim();
@@ -187,7 +118,7 @@ export default function HomePage() {
     };
     setState((prev) => addTodo(prev, todo));
     setTodoInput("");
-  }, [todoInput]);
+  }, [todoInput, setState]);
 
   const handleAddDistraction = useCallback(() => {
     const text = distractionInput.trim();
@@ -200,12 +131,27 @@ export default function HomePage() {
     };
     setState((prev) => addDistraction(prev, d));
     setDistractionInput("");
-  }, [distractionInput]);
+  }, [distractionInput, setState]);
+
+  // displayMode = the tab the user is viewing (may differ from the running mode)
+  const [displayMode, setDisplayMode] = useState<TimerMode>(mode);
+  // Keep displayMode in sync when the timer itself changes mode (e.g. on completion)
+  useEffect(() => {
+    setDisplayMode(mode);
+  }, [mode]);
+
+  const displayConfig = MODE_CONFIG[displayMode];
+  const isViewingRunningMode = displayMode === mode;
+
+  // What the timer ring / countdown should show:
+  // - Viewing the active mode → show live countdown & progress
+  // - Viewing a different mode → show its full duration (fresh preview)
+  const displaySeconds   = isViewingRunningMode ? secondsLeft : (state.settings[displayMode === "focus" ? "focusDuration" : displayMode === "short-break" ? "shortBreakDuration" : "longBreakDuration"] * 60);
+  const displayProgress  = isViewingRunningMode ? progress : 0;
 
   const todaySessions = getTodaySessions(state);
   const completedToday = todaySessions.filter((s) => s.completed).length;
   const pendingDistractions = state.distractions.filter((d) => !d.resolved);
-
   const pomodoroRound = (state.pomodoroCount % 4) + 1;
 
   return (
@@ -215,20 +161,25 @@ export default function HomePage() {
         <div className="flex items-center justify-center gap-2">
           {(["focus", "short-break", "long-break"] as TimerMode[]).map((m) => {
             const cfg = MODE_CONFIG[m];
+            const isActiveRunning = m === mode && isRunning;
             return (
               <button
                 key={m}
                 id={`mode-${m}`}
-                onClick={() => handleSwitchMode(m)}
+                onClick={() => setDisplayMode(m)}
                 className={cn(
-                  "flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
-                  mode === m
+                  "relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
+                  displayMode === m
                     ? `${cfg.bgAccent} border text-foreground shadow-sm`
                     : "text-muted-foreground hover:text-foreground hover:bg-accent border border-transparent"
                 )}
               >
                 {cfg.icon}
                 {cfg.label}
+                {/* Pulsing dot to indicate this mode is actively running */}
+                {isActiveRunning && displayMode !== m && (
+                  <span className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-primary animate-pulse" />
+                )}
               </button>
             );
           })}
@@ -238,7 +189,7 @@ export default function HomePage() {
         <div
           className={cn(
             "glass rounded-3xl p-8 flex flex-col items-center gap-8 transition-all duration-500",
-            config.glowClass
+            displayConfig.glowClass
           )}
         >
           {/* Round indicator */}
@@ -264,30 +215,38 @@ export default function HomePage() {
             </span>
           </div>
 
+          {/* Running-in-background notice */}
+          {!isViewingRunningMode && isRunning && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/30 px-3 py-1.5 rounded-full border border-border/40 animate-fade-in">
+              <span className="size-1.5 rounded-full bg-primary animate-pulse" />
+              {MODE_LABELS[mode]} running — {formatTime(secondsLeft)} left
+            </div>
+          )}
+
           {/* Timer ring */}
-          <div className={cn("relative", justCompleted && "animate-pulse-ring")}>
+          <div className={cn("relative", justCompleted && isViewingRunningMode && "animate-pulse-ring")}>
             <CircularProgress
-              value={progress}
+              value={displayProgress}
               max={100}
               size={240}
               thickness={8}
               className="select-none"
             >
               <CircularProgressIndicator>
-                <CircularProgressTrack className={config.trackClass} />
+                <CircularProgressTrack className={displayConfig.trackClass} />
                 <CircularProgressRange
-                  className={cn(config.rangeClass, "transition-all duration-1000")}
+                  className={cn(displayConfig.rangeClass, "transition-all duration-1000")}
                 />
               </CircularProgressIndicator>
 
               {/* Center content */}
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
                 <div className="text-5xl font-bold tabular-nums tracking-tighter leading-none">
-                  {formatTime(secondsLeft)}
+                  {formatTime(displaySeconds)}
                 </div>
                 <div className="flex items-center gap-1 text-muted-foreground text-xs font-medium mt-1">
                   <Clock className="size-3" />
-                  {MODE_LABELS[mode]}
+                  {MODE_LABELS[displayMode]}
                 </div>
               </div>
             </CircularProgress>
@@ -307,23 +266,31 @@ export default function HomePage() {
 
             <Button
               id="btn-start-pause"
-              onClick={isRunning ? pause : handleStart}
+              onClick={() => {
+                if (isViewingRunningMode) {
+                  // Controlling the running timer directly
+                  isRunning ? pause() : handleStart();
+                } else {
+                  // Switch to the viewed mode and start it
+                  handleSwitchMode(displayMode);
+                }
+              }}
               size="lg"
               className={cn(
                 "px-10 rounded-full font-semibold text-base transition-all duration-300",
-                mode === "focus"
+                displayMode === "focus"
                   ? "bg-primary hover:bg-primary/90 shadow-lg shadow-primary/30"
-                  : mode === "short-break"
+                  : displayMode === "short-break"
                   ? "bg-emerald-500 hover:bg-emerald-500/90 shadow-lg shadow-emerald-500/30 text-white"
                   : "bg-blue-400 hover:bg-blue-400/90 shadow-lg shadow-blue-400/30 text-white"
               )}
             >
-              {isRunning ? (
+              {isViewingRunningMode && isRunning ? (
                 <><Pause className="size-5 mr-2" /> Pause</>
-              ) : secondsLeft === TIMER_DURATIONS[mode] ? (
-                <><Play className="size-5 mr-2" /> Start</>
-              ) : (
+              ) : isViewingRunningMode && secondsLeft < TIMER_DURATIONS[mode] ? (
                 <><Play className="size-5 mr-2" /> Resume</>
+              ) : (
+                <><Play className="size-5 mr-2" /> Start</>
               )}
             </Button>
 

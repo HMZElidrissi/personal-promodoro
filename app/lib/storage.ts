@@ -1,4 +1,5 @@
 import type { AppState, Session, Distraction, TodoItem } from "./types";
+import { DEFAULT_SETTINGS } from "./types";
 
 const STORAGE_KEY = "pomodoro-app-state";
 
@@ -16,6 +17,8 @@ export function loadState(): AppState {
     const parsed = JSON.parse(raw) as AppState;
     // Migrate: add todos array if missing (backwards compat)
     if (!parsed.todos) parsed.todos = [];
+    // Migrate: add settings if missing (backwards compat)
+    if (!parsed.settings) parsed.settings = { ...DEFAULT_SETTINGS };
     // Reset daily pomodoroCount if the date changed
     if (parsed.lastResetDate !== todayString()) {
       parsed.pomodoroCount = 0;
@@ -43,6 +46,7 @@ function getDefaultState(): AppState {
     todos: [],
     pomodoroCount: 0,
     lastResetDate: todayString(),
+    settings: { ...DEFAULT_SETTINGS },
   };
 }
 

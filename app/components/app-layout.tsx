@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router";
 import { Timer, History, ListChecks } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { TimerSettingsPopover } from "@/components/timer-settings";
 
 const navItems = [
   { to: "/", icon: Timer, label: "Timer" },
@@ -41,6 +42,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               </Link>
             ))}
           </nav>
+          <TimerSettingsPopover />
         </div>
       </header>
 

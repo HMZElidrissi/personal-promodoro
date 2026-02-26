@@ -5,9 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans:
-    'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-    'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
 }
 
 @theme inline {
@@ -52,76 +51,110 @@
   }
 }
 
-/* ─── Design tokens ─── */
+/* ─── Geist Design Tokens ─── */
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --radius: 0.5rem;
+
+  /* Light mode — clean whites & cool grays */
+  --background: oklch(0.99 0 0);
+  --foreground: oklch(0.09 0 0);
+
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.09 0 0);
+
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --popover-foreground: oklch(0.09 0 0);
+
+  /* Primary = near-black */
+  --primary: oklch(0.09 0 0);
+  --primary-foreground: oklch(0.99 0 0);
+
+  --secondary: oklch(0.96 0 0);
+  --secondary-foreground: oklch(0.09 0 0);
+
+  --muted: oklch(0.96 0 0);
+  --muted-foreground: oklch(0.51 0 0);
+
+  --accent: oklch(0.96 0 0);
+  --accent-foreground: oklch(0.09 0 0);
+
+  --destructive: oklch(0.56 0.22 27);
+
+  --border: oklch(0.91 0 0);
+  --input: oklch(0.91 0 0);
+  --ring: oklch(0.71 0 0);
+
+  /* Focus timer: warm neutral */
+  --timer-focus: oklch(0.09 0 0);
+  --timer-break: oklch(0.46 0.14 160);
+  --timer-long-break: oklch(0.5 0.12 240);
+
+  --chart-1: oklch(0.65 0.22 41);
+  --chart-2: oklch(0.6 0.12 185);
+  --chart-3: oklch(0.4 0.07 227);
+  --chart-4: oklch(0.83 0.19 84);
+  --chart-5: oklch(0.77 0.19 70);
+
+  --sidebar: oklch(0.98 0 0);
+  --sidebar-foreground: oklch(0.09 0 0);
+  --sidebar-primary: oklch(0.09 0 0);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.96 0 0);
+  --sidebar-accent-foreground: oklch(0.09 0 0);
+  --sidebar-border: oklch(0.91 0 0);
+  --sidebar-ring: oklch(0.71 0 0);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.269 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.371 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.439 0 0);
+  /* Geist dark — deep near-black with warm undertone */
+  --background: oklch(0.08 0.002 260);
+  --foreground: oklch(0.97 0 0);
+
+  --card: oklch(0.11 0.003 260);
+  --card-foreground: oklch(0.97 0 0);
+
+  --popover: oklch(0.13 0.003 260);
+  --popover-foreground: oklch(0.97 0 0);
+
+  /* Primary = near-white */
+  --primary: oklch(0.97 0 0);
+  --primary-foreground: oklch(0.08 0 0);
+
+  --secondary: oklch(0.16 0.003 260);
+  --secondary-foreground: oklch(0.97 0 0);
+
+  --muted: oklch(0.16 0.003 260);
+  --muted-foreground: oklch(0.56 0 0);
+
+  --accent: oklch(0.19 0.003 260);
+  --accent-foreground: oklch(0.97 0 0);
+
+  --destructive: oklch(0.65 0.2 27);
+
+  /* Subtle, precise borders — Geist signature */
+  --border: oklch(1 0 0 / 0.08);
+  --input: oklch(1 0 0 / 0.08);
+  --ring: oklch(1 0 0 / 0.2);
+
+  /* Timer accent colors */
+  --timer-focus: oklch(0.97 0 0);
+  --timer-break: oklch(0.6 0.16 160);
+  --timer-long-break: oklch(0.58 0.14 240);
+
+  --chart-1: oklch(0.49 0.24 264);
+  --chart-2: oklch(0.7 0.17 162);
+  --chart-3: oklch(0.77 0.19 70);
+  --chart-4: oklch(0.63 0.27 304);
+  --chart-5: oklch(0.65 0.25 16);
+
+  --sidebar: oklch(0.11 0.003 260);
+  --sidebar-foreground: oklch(0.97 0 0);
+  --sidebar-primary: oklch(0.49 0.24 264);
+  --sidebar-primary-foreground: oklch(0.97 0 0);
+  --sidebar-accent: oklch(0.16 0.003 260);
+  --sidebar-accent-foreground: oklch(0.97 0 0);
+  --sidebar-border: oklch(1 0 0 / 0.08);
+  --sidebar-ring: oklch(1 0 0 / 0.2);
 }
 
 html,
@@ -129,6 +162,9 @@ body {
   background: var(--background);
   color: var(--foreground);
   min-height: 100vh;
+  font-feature-settings: 'rlig' 1, 'calt' 1, 'ss01' 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 @layer base {
@@ -140,63 +176,85 @@ body {
   }
 }
 
-/* ─── Custom utilities ─── */
+/* ─── Geist Panel — sharp glass, minimal blur ─── */
 .glass {
-  background: oklch(0.16 0.03 265 / 0.7);
-  backdrop-filter: blur(12px);
-  border: 1px solid oklch(1 0 0 / 0.06);
+  background: oklch(1 0 0 / 0.03);
+  backdrop-filter: blur(8px) saturate(120%);
+  border: 1px solid oklch(1 0 0 / 0.08);
 }
 
+.dark .glass {
+  background: oklch(1 0 0 / 0.032);
+  border-color: oklch(1 0 0 / 0.07);
+}
+
+/* ─── Subtle shadow instead of glows ─── */
 .glow-primary {
-  box-shadow: 0 0 30px oklch(0.65 0.22 25 / 0.3);
+  box-shadow:
+    0 0 0 1px oklch(1 0 0 / 0.1),
+    0 8px 32px oklch(0 0 0 / 0.4),
+    0 2px 8px oklch(0 0 0 / 0.2);
 }
 
 .glow-break {
-  box-shadow: 0 0 30px oklch(0.62 0.18 160 / 0.3);
+  box-shadow:
+    0 0 0 1px oklch(0.6 0.16 160 / 0.15),
+    0 8px 32px oklch(0 0 0 / 0.4),
+    0 2px 8px oklch(0 0 0 / 0.2);
 }
 
 .glow-long-break {
-  box-shadow: 0 0 30px oklch(0.62 0.18 240 / 0.25);
+  box-shadow:
+    0 0 0 1px oklch(0.58 0.14 240 / 0.15),
+    0 8px 32px oklch(0 0 0 / 0.4),
+    0 2px 8px oklch(0 0 0 / 0.2);
 }
 
-/* Fancy gradient text */
+/* ─── Gradient text → flat foreground in Geist style ─── */
 .gradient-text {
-  background: linear-gradient(135deg, oklch(0.65 0.22 25), oklch(0.72 0.19 60));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--foreground);
+  font-weight: 600;
+  letter-spacing: -0.025em;
 }
 
-/* Timer ring custom colors */
+/* ─── Timer ring custom colors ─── */
 .ring-focus {
-  color: oklch(0.65 0.22 25);
+  color: var(--timer-focus);
 }
 .ring-break {
-  color: oklch(0.62 0.18 160);
+  color: var(--timer-break);
 }
 .ring-long-break {
-  color: oklch(0.62 0.18 240);
+  color: var(--timer-long-break);
 }
 
-/* Smooth pulse for active timer */
+/* ─── Geist monospaced timer digits ─── */
+.timer-digits {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  font-weight: 700;
+}
+
+/* ─── Smooth pulse for active timer ─── */
 @keyframes pulse-ring {
   0%,
   100% {
     opacity: 1;
   }
   50% {
-    opacity: 0.7;
+    opacity: 0.72;
   }
 }
 .animate-pulse-ring {
-  animation: pulse-ring 2s ease-in-out infinite;
+  animation: pulse-ring 2.4s ease-in-out infinite;
 }
 
-/* Slide in animation */
+/* ─── Slide in animation ─── */
 @keyframes slide-up {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -204,10 +262,10 @@ body {
   }
 }
 .animate-slide-up {
-  animation: slide-up 0.3s ease-out;
+  animation: slide-up 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Fade in */
+/* ─── Fade in ─── */
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -217,16 +275,16 @@ body {
   }
 }
 .animate-fade-in {
-  animation: fade-in 0.4s ease-out;
+  animation: fade-in 0.35s ease-out;
 }
 
-/* Todo item check pop */
+/* ─── Todo item check pop ─── */
 @keyframes todo-check {
   0% {
     transform: scale(1);
   }
   30% {
-    transform: scale(0.96);
+    transform: scale(0.97);
   }
   65% {
     transform: scale(1.01);
@@ -236,14 +294,45 @@ body {
   }
 }
 .todo-completed {
-  animation: todo-check 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: todo-check 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Smooth strikethrough */
+/* ─── Smooth strikethrough ─── */
 .todo-strike {
   text-decoration: line-through;
-  text-decoration-thickness: 1.5px;
+  text-decoration-thickness: 1px;
   transition:
-    color 0.25s ease,
-    text-decoration-color 0.25s ease;
+    color 0.2s ease,
+    text-decoration-color 0.2s ease;
+}
+
+/* ─── Geist noise texture overlay (subtle grain) ─── */
+.geist-panel {
+  position: relative;
+}
+.geist-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  z-index: 0;
+}
+
+/* ─── Geist separator ─── */
+.geist-separator {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border) 20%, var(--border) 80%, transparent);
+}
+
+/* ─── Contribution graph — preserve original visibility ─── */
+/* The Geist dark background makes fill-muted barely distinguishable
+   from the card, so we locally bump --muted to a slightly lighter swatch
+   inside the graph wrapper only. Emerald fills are untouched. */
+.dark .contribution-graph-panel {
+  --muted: oklch(0.22 0.003 260);
 }

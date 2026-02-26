@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils';
 
 export function meta() {
   return [
-    { title: 'Parking Lot — Personal Pomodoro' },
+    { title: 'Parking Lot ~ your personal promodoro' },
     {
       name: 'description',
       content: 'Manage distraction thoughts captured during focus sessions.',
@@ -71,7 +71,7 @@ export default function DistractionsPage() {
         {/* Header */}
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Parking Lot</h1>
+            <h1 className="text-xl font-semibold tracking-tight">Parking Lot</h1>
             <p className="text-muted-foreground mt-1 text-sm">
               Thoughts that popped up during focus — handle them later.
             </p>
@@ -135,65 +135,62 @@ export default function DistractionsPage() {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3">
           <MiniStat
-            icon={<ListChecksIcon className="size-4 text-amber-400" />}
+            icon={<ListChecksIcon className="text-foreground/60 size-4" strokeWidth={1.75} />}
             value={state.distractions.length}
             label="Total"
-            accent="amber"
           />
           <MiniStat
-            icon={<Circle className="text-primary size-4" />}
+            icon={<Circle className="text-foreground/60 size-4" strokeWidth={1.75} />}
             value={pendingCount}
             label="Pending"
-            accent="primary"
           />
           <MiniStat
-            icon={<CheckCircle2 className="size-4 text-emerald-400" />}
+            icon={<CheckCircle2 className="size-4 text-teal-500" strokeWidth={1.75} />}
             value={resolvedCount}
             label="Resolved"
-            accent="emerald"
           />
         </div>
 
         {/* Add new */}
-        <div className="glass flex gap-2 rounded-2xl p-4">
+        <div className="glass border-border/60 flex gap-2 rounded-xl border p-4">
           <Input
             id="distraction-full-input"
             placeholder="Add a distraction or task to deal with later..."
             value={newText}
             onChange={(e) => setNewText(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-            className="bg-input/50 border-border/50 focus-visible:ring-amber-400/50"
+            className="border-border/60 bg-transparent text-sm focus-visible:ring-foreground/20"
           />
           <Button
             id="btn-add-full"
             onClick={handleAdd}
             disabled={!newText.trim()}
-            className="shrink-0 gap-1.5 bg-amber-400/90 font-semibold text-black hover:bg-amber-400"
+            className="bg-foreground text-background hover:bg-foreground/90 shrink-0 gap-1.5 text-sm font-medium shadow-sm"
           >
-            <Plus className="size-4" />
+            <Plus className="size-3.5" strokeWidth={1.75} />
             Add
           </Button>
         </div>
 
         {/* Filter tabs */}
-        <div className="glass flex w-fit items-center gap-1 rounded-xl p-1">
+        <div className="border-border/60 bg-card flex w-fit items-center gap-0.5 rounded-lg border p-1">
           {filterButtons.map(({ id, label, count }) => (
             <button
               key={id}
               id={`filter-${id}`}
               onClick={() => setFilter(id)}
               className={cn(
-                'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200',
+                'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-150',
                 filter === id
-                  ? 'bg-primary/15 text-primary'
-                  : 'text-muted-foreground hover:text-foreground',
+                  ? 'bg-foreground/8 text-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-foreground/4',
               )}
             >
               {label}
               <span
                 className={cn(
-                  'rounded-full px-1.5 py-0.5 text-[10px] tabular-nums',
-                  filter === id ? 'bg-primary/20' : 'bg-muted',
+                  'rounded-full px-1.5 py-0.5 text-[10px] tabular-nums font-mono',
+                  filter === id ? 'bg-foreground/10' : 'bg-foreground/5',
                 )}
               >
                 {count}
@@ -203,18 +200,18 @@ export default function DistractionsPage() {
         </div>
 
         {/* List */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1.5">
           {displayed.length === 0 ? (
-            <div className="glass flex flex-col items-center gap-3 rounded-2xl p-10 text-center">
-              <div className="flex size-10 items-center justify-center rounded-xl bg-amber-400/10">
-                <CheckCircle2 className="size-5 text-amber-400" />
+            <div className="border-border/50 flex flex-col items-center gap-3 rounded-xl border p-10 text-center">
+              <div className="bg-foreground/5 border-border/60 flex size-9 items-center justify-center rounded-lg border">
+                <CheckCircle2 className="text-foreground/50 size-4" strokeWidth={1.5} />
               </div>
               <p className="text-muted-foreground text-sm">
                 {filter === 'resolved'
                   ? 'Nothing resolved yet.'
                   : filter === 'pending'
                     ? 'All clear! No pending items.'
-                    : 'No distractions captured. Stay focused! 🎯'}
+                    : 'No distractions captured. Stay focused!'}
               </p>
             </div>
           ) : (
@@ -245,22 +242,22 @@ function DistractionItem({
   return (
     <div
       className={cn(
-        'glass group hover:bg-muted/10 animate-slide-up flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200',
-        d.resolved && 'opacity-60',
+        'border-border/50 group hover:border-border hover:bg-foreground/2 animate-slide-up flex items-center gap-3 rounded-lg border px-4 py-3 transition-all duration-150',
+        d.resolved && 'opacity-50',
       )}
     >
       <Checkbox
         id={`distraction-full-${d.id}`}
         checked={d.resolved}
         onCheckedChange={onToggle}
-        className="border-border/60 size-4 data-[state=checked]:border-emerald-500 data-[state=checked]:bg-emerald-500"
+        className="border-border/80 size-4 data-[state=checked]:border-foreground data-[state=checked]:bg-foreground"
       />
 
       <div className="min-w-0 flex-1">
-        <p className={cn('text-sm', d.resolved && 'text-muted-foreground line-through')}>
+        <p className={cn('text-sm', d.resolved && 'text-muted-foreground/60 line-through')}>
           {d.text}
         </p>
-        <p className="text-muted-foreground/60 mt-0.5 text-xs">
+        <p className="text-muted-foreground/50 font-mono mt-0.5 text-[11px]">
           {new Date(d.createdAt).toLocaleString([], {
             month: 'short',
             day: 'numeric',
@@ -273,7 +270,7 @@ function DistractionItem({
       {d.resolved && (
         <Badge
           variant="secondary"
-          className="shrink-0 border-emerald-500/20 bg-emerald-500/10 text-xs text-emerald-400"
+          className="border-teal-500/20 bg-teal-500/8 shrink-0 text-xs text-teal-600 dark:text-teal-400"
         >
           Done
         </Badge>
@@ -281,9 +278,9 @@ function DistractionItem({
 
       <button
         onClick={onDelete}
-        className="text-muted-foreground/30 hover:text-destructive shrink-0 opacity-0 transition-colors group-hover:opacity-100"
+        className="text-muted-foreground/30 hover:text-foreground/60 shrink-0 opacity-0 transition-colors group-hover:opacity-100"
       >
-        <X className="size-4" />
+        <X className="size-3.5" strokeWidth={1.5} />
       </button>
     </div>
   );
@@ -293,23 +290,15 @@ function MiniStat({
   icon,
   value,
   label,
-  accent,
 }: {
   icon: React.ReactNode;
   value: number;
   label: string;
-  accent: 'amber' | 'primary' | 'emerald';
 }) {
-  const bg = {
-    amber: 'border-amber-400/20 bg-amber-400/5',
-    primary: 'border-primary/20 bg-primary/5',
-    emerald: 'border-emerald-500/20 bg-emerald-500/5',
-  }[accent];
-
   return (
-    <div className={cn('glass flex flex-col items-center gap-1.5 rounded-2xl border p-4', bg)}>
+    <div className="border-border/50 flex flex-col items-center gap-1.5 rounded-xl border p-4">
       {icon}
-      <div className="text-2xl font-bold tabular-nums">{value}</div>
+      <div className="text-2xl font-semibold tabular-nums tracking-tight" style={{ fontFamily: 'var(--font-mono)' }}>{value}</div>
       <div className="text-muted-foreground text-xs">{label}</div>
     </div>
   );

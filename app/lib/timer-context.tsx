@@ -76,7 +76,7 @@ export function TimerProvider({ children }: { children: ReactNode }) {
       }
 
       if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-        new Notification('Personal Pomodoro', {
+        new Notification('~ your personal promodoro', {
           body:
             completedMode === 'focus'
               ? '🍅 Focus session complete! Time for a break.'

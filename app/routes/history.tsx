@@ -20,7 +20,7 @@ import {
 
 export function meta() {
   return [
-    { title: 'History — Personal Pomodoro' },
+    { title: 'History ~ your personal promodoro' },
     {
       name: 'description',
       content: "Your Pomodoro session history — see what you've accomplished.",
@@ -105,7 +105,7 @@ export default function HistoryPage() {
         {/* Header */}
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Session History</h1>
+            <h1 className="text-xl font-semibold tracking-tight">Session History</h1>
             <p className="text-muted-foreground mt-1 text-sm">
               Your completed Pomodoro sessions over time.
             </p>
@@ -124,7 +124,7 @@ export default function HistoryPage() {
                     setConfirmClear(false);
                   }}
                 >
-                  <Eraser className="size-3" />
+                  <Eraser className="size-3" strokeWidth={1.75} />
                   Yes, clear
                 </Button>
                 <Button
@@ -145,15 +145,15 @@ export default function HistoryPage() {
                 className="text-muted-foreground hover:text-destructive gap-1.5 text-xs"
                 onClick={() => setConfirmClear(true)}
               >
-                <Eraser className="size-3.5" />
+                <Eraser className="size-3.5" strokeWidth={1.75} />
                 Clear all
               </Button>
             ))}
         </div>
 
-        {/* Contribution graph */}
+        {/* Contribution graph — original emerald style preserved */}
         {contributionData.length > 0 && (
-          <div className="glass rounded-2xl border border-border/40 p-4">
+          <div className="contribution-graph-panel glass rounded-2xl border border-border/40 p-5">
             <ContributionGraph
               data={contributionData}
               className="w-full"
@@ -179,7 +179,7 @@ export default function HistoryPage() {
                   />
                 )}
               </ContributionGraphCalendar>
-              <ContributionGraphFooter className="mt-2">
+              <ContributionGraphFooter className="mt-3">
                 <ContributionGraphTotalCount className="text-muted-foreground text-xs">
                   {({ totalCount, year }) => (
                     <span className="text-muted-foreground text-xs">
@@ -227,14 +227,14 @@ export default function HistoryPage() {
               return (
                 <section key={dateStr}>
                   <div className="mb-3 flex items-center justify-between">
-                    <h2 className="text-foreground/80 text-sm font-semibold">
+                    <h2 className="text-foreground/75 text-xs font-semibold tracking-wide uppercase">
                       {formatDateHeading(dateStr)}
                     </h2>
-                    <Badge variant="secondary" className="bg-muted/60 text-xs">
-                      {dayCompleted}/{daySessions.length} completed
+                    <Badge variant="secondary" className="border-border/50 bg-foreground/5 text-muted-foreground text-xs">
+                      {dayCompleted}/{daySessions.length} done
                     </Badge>
                   </div>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-1.5">
                     {daySessions.map((session, idx) => (
                       <SessionCard
                         key={session.id}
@@ -243,7 +243,7 @@ export default function HistoryPage() {
                       />
                     ))}
                   </div>
-                  <Separator className="bg-border/30 mt-6" />
+                  <div className="geist-separator mt-6" />
                 </section>
               );
             })}
@@ -264,21 +264,21 @@ function SessionCard({ session, index }: { session: Session; index: number }) {
   return (
     <div
       className={cn(
-        'glass hover:bg-muted/20 flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200',
-        !session.completed && 'opacity-60',
+        'border-border/50 hover:border-border hover:bg-foreground/2 flex items-center gap-3 rounded-lg border px-4 py-3 transition-all duration-150',
+        !session.completed && 'opacity-55',
       )}
     >
       {session.completed ? (
-        <CheckCircle2 className="size-4 shrink-0 text-emerald-400" />
+        <CheckCircle2 className="size-3.5 shrink-0 text-teal-500" strokeWidth={1.75} />
       ) : (
-        <XCircle className="text-destructive/60 size-4 shrink-0" />
+        <XCircle className="text-destructive/50 size-3.5 shrink-0" strokeWidth={1.75} />
       )}
 
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium">{title}</p>
         <div className="mt-0.5 flex items-center gap-1.5">
-          <Clock className="text-muted-foreground size-3" />
-          <span className="text-muted-foreground text-xs">
+          <Clock className="text-muted-foreground/60 size-3" strokeWidth={1.5} />
+          <span className="text-muted-foreground font-mono text-[11px]">
             {new Date(session.startTime).toLocaleTimeString([], {
               hour: '2-digit',
               minute: '2-digit',
@@ -293,8 +293,8 @@ function SessionCard({ session, index }: { session: Session; index: number }) {
         className={cn(
           'shrink-0 text-xs',
           session.completed
-            ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400'
-            : 'bg-destructive/10 text-destructive border-destructive/20',
+            ? 'border-teal-500/20 bg-teal-500/8 text-teal-600 dark:text-teal-400'
+            : 'bg-foreground/5 text-muted-foreground border-border/50',
         )}
       >
         {session.completed ? 'Done' : 'Abandoned'}
@@ -305,11 +305,11 @@ function SessionCard({ session, index }: { session: Session; index: number }) {
 
 function EmptyState() {
   return (
-    <div className="glass flex flex-col items-center gap-3 rounded-2xl p-12 text-center">
-      <div className="bg-primary/10 flex size-12 items-center justify-center rounded-2xl">
-        <Clock className="text-primary size-6" />
+    <div className="border-border/50 flex flex-col items-center gap-3 rounded-xl border p-12 text-center">
+      <div className="bg-foreground/5 border-border/60 flex size-10 items-center justify-center rounded-lg border">
+        <Clock className="text-foreground/60 size-5" strokeWidth={1.5} />
       </div>
-      <h3 className="font-semibold">No sessions yet</h3>
+      <h3 className="text-sm font-semibold">No sessions yet</h3>
       <p className="text-muted-foreground max-w-xs text-sm">
         Start your first Pomodoro session on the timer page. Your history will appear here.
       </p>

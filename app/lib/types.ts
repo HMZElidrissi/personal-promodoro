@@ -4,12 +4,14 @@ export interface TimerSettings {
   focusDuration: number; // minutes
   shortBreakDuration: number; // minutes
   longBreakDuration: number; // minutes
+  soundEnabled: boolean;
 }
 
 export const DEFAULT_SETTINGS: TimerSettings = {
   focusDuration: 25,
   shortBreakDuration: 5,
   longBreakDuration: 15,
+  soundEnabled: true,
 };
 
 export interface Session {

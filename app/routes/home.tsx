@@ -23,6 +23,8 @@ import {
   CheckCircle2,
   Clock,
   ListChecks,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TIMER_DURATIONS, MODE_LABELS } from '@/lib/use-timer';
@@ -104,6 +106,7 @@ export default function HomePage() {
     handleStart,
     handleReset,
     handleSwitchMode,
+    updateSettings,
   } = useTimerContext();
 
   const [todoInput, setTodoInput] = useState('');
@@ -309,7 +312,24 @@ export default function HomePage() {
                 </>
               )}
             </Button>
-            <div className="size-9" /> {/* spacer */}
+            <Button
+              id="btn-toggle-sound"
+              variant="ghost"
+              size="icon"
+              onClick={() =>
+                updateSettings({
+                  soundEnabled: !state.settings.soundEnabled,
+                })
+              }
+              title={state.settings.soundEnabled ? 'Mute sounds' : 'Unmute sounds'}
+              className="border-border/50 text-muted-foreground hover:border-border hover:text-foreground size-9 rounded-lg border transition-all duration-150"
+            >
+              {state.settings.soundEnabled ? (
+                <Volume2 className="size-3.5" strokeWidth={1.75} />
+              ) : (
+                <VolumeX className="size-3.5" strokeWidth={1.75} />
+              )}
+            </Button>
           </div>
 
           {/* Completion message */}

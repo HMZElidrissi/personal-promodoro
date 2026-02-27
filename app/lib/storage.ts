@@ -18,7 +18,12 @@ export function loadState(): AppState {
     // Migrate: add todos array if missing (backwards compat)
     if (!parsed.todos) parsed.todos = [];
     // Migrate: add settings if missing (backwards compat)
-    if (!parsed.settings) parsed.settings = { ...DEFAULT_SETTINGS };
+    if (!parsed.settings) {
+      parsed.settings = { ...DEFAULT_SETTINGS };
+    } else {
+      // Ensure any new settings keys get defaults
+      parsed.settings = { ...DEFAULT_SETTINGS, ...parsed.settings };
+    }
     // Reset daily pomodoroCount if the date changed
     if (parsed.lastResetDate !== todayString()) {
       parsed.pomodoroCount = 0;

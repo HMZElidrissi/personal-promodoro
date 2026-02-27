@@ -1,7 +1,16 @@
-import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+  useRef,
+  type ReactNode,
+} from 'react';
 import { useTimer, TIMER_DURATIONS } from './use-timer';
 import { loadState, saveState, addSession, completeSession, abandonSession } from './storage';
-import { playCompletionSound } from './sounds';
+import { playCompletionSound, playTickSound } from './sounds';
 import type { AppState, Session, TimerMode, TimerSettings } from './types';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -66,7 +75,9 @@ export function TimerProvider({ children }: { children: ReactNode }) {
 
   const handleComplete = useCallback(
     (completedMode: TimerMode) => {
-      playCompletionSound();
+      if (state.settings.soundEnabled ?? true) {
+        playCompletionSound();
+      }
       setJustCompleted(true);
       setTimeout(() => setJustCompleted(false), 3000);
 
@@ -85,7 +96,7 @@ export function TimerProvider({ children }: { children: ReactNode }) {
         });
       }
     },
-    [currentSessionId, persistAndSet],
+    [currentSessionId, persistAndSet, state.settings.soundEnabled],
   );
 
   // Derive durations (in seconds) from persisted settings
@@ -158,6 +169,22 @@ export function TimerProvider({ children }: { children: ReactNode }) {
     },
     [currentSessionId, switchMode, persistAndSet],
   );
+
+  // Play subtle tick when the visible seconds decrease, respecting mute setting.
+  const prevSecondsRef = useRef(secondsLeft);
+  useEffect(() => {
+    const prev = prevSecondsRef.current;
+    if (
+      state.settings.soundEnabled &&
+      isRunning &&
+      secondsLeft > 0 &&
+      secondsLeft < totalSeconds &&
+      secondsLeft !== prev
+    ) {
+      playTickSound();
+    }
+    prevSecondsRef.current = secondsLeft;
+  }, [secondsLeft, isRunning, totalSeconds, state.settings.soundEnabled]);
 
   return (
     <TimerContext.Provider

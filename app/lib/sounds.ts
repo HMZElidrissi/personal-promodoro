@@ -1,3 +1,5 @@
+let tickCtx: AudioContext | null = null;
+
 /**
  * Plays a gentle completion chime using the Web Audio API.
  * No external audio file required.
@@ -41,21 +43,41 @@ export function playCompletionSound(): void {
 export function playTickSound(): void {
   if (typeof window === 'undefined') return;
   try {
-    const ctx = new AudioContext();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+    if (!tickCtx) {
+      tickCtx = new AudioContext();
+    }
+    const ctx = tickCtx;
+    const duration = 0.04;
+    const sampleRate = ctx.sampleRate;
+    const buffer = ctx.createBuffer(1, sampleRate * duration, sampleRate);
+    const data = buffer.getChannelData(0);
 
-    osc.connect(gain);
+    // White noise burst
+    for (let i = 0; i < data.length; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+
+    // High-pass to make it a subtle "tick" instead of a thump
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'highpass';
+    filter.frequency.value = 2000;
+
+    const gain = ctx.createGain();
+    const now = ctx.currentTime;
+
+    noise.connect(filter);
+    filter.connect(gain);
     gain.connect(ctx.destination);
 
-    osc.type = 'sine';
-    osc.frequency.value = 1000;
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.12, now + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
-    gain.gain.setValueAtTime(0.05, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
-
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.05);
+    noise.start(now);
+    noise.stop(now + duration);
   } catch {
     // fail silently
   }

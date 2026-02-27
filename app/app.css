@@ -188,6 +188,18 @@ body {
   border-color: oklch(1 0 0 / 0.07);
 }
 
+/* Darker glass for Timer Settings popover */
+.glass-darker {
+  backdrop-filter: blur(8px) saturate(120%);
+  border: 1px solid oklch(1 0 0 / 0.08);
+  background: oklch(0 0 0 / 0.06);
+}
+
+.dark .glass-darker {
+  background: oklch(0.18 0 0 / 0.92);
+  border-color: oklch(1 0 0 / 0.12);
+}
+
 /* ─── Subtle shadow instead of glows ─── */
 .glow-primary {
   box-shadow:

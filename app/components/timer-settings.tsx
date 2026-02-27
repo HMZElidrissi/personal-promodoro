@@ -54,7 +54,7 @@ export function TimerSettingsPopover() {
         <div
           className={cn(
             'absolute top-10 right-0 z-50 w-72',
-            'glass border-border/60 rounded-2xl border shadow-2xl',
+            'glass-darker border-border/60 rounded-2xl border shadow-2xl',
             'flex flex-col gap-5 p-5',
             'animate-slide-up',
           )}

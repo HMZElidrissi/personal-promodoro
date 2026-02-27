@@ -459,7 +459,7 @@ export default function HomePage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <ListChecks className="text-foreground/70 size-3.5" strokeWidth={1.75} />
-                <h2 className="text-sm font-semibold tracking-tight">Parking Lot</h2>
+                <h2 className="text-sm font-semibold tracking-tight">Things that distracted me</h2>
               </div>
               {pendingDistractions.length > 0 && (
                 <Badge
@@ -533,7 +533,7 @@ export default function HomePage() {
               ))}
               {state.distractions.length > 5 && (
                 <p className="text-muted-foreground py-1 text-center text-xs">
-                  +{state.distractions.length - 5} more in Parking Lot
+                  +{state.distractions.length - 5} more in Things that distracted me
                 </p>
               )}
             </div>

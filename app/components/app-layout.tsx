@@ -6,7 +6,7 @@ import { TimerSettingsPopover } from '@/components/timer-settings';
 const navItems = [
   { to: '/', icon: Timer, label: 'Timer' },
   { to: '/history', icon: History, label: 'History' },
-  { to: '/distractions', icon: ListChecks, label: 'Parking Lot' },
+  { to: '/distractions', icon: ListChecks, label: 'Things that distracted me' },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

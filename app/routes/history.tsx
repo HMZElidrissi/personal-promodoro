@@ -20,10 +20,10 @@ import {
 
 export function meta() {
   return [
-    { title: 'History ~ your personal promodoro' },
+    { title: '~ my pomodoro sessions' },
     {
       name: 'description',
-      content: "Your Pomodoro session history — see what you've accomplished.",
+      content: "My Pomodoro session history — see what I've accomplished.",
     },
   ];
 }
@@ -105,9 +105,9 @@ export default function HistoryPage() {
         {/* Header */}
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-xl font-semibold tracking-tight">Session History</h1>
+            <h1 className="text-xl font-semibold tracking-tight">Session History Graph</h1>
             <p className="text-muted-foreground mt-1 text-sm">
-              Your completed Pomodoro sessions over time.
+              My completed Pomodoro sessions over time.
             </p>
           </div>
           {sessions.length > 0 &&

@@ -17,10 +17,10 @@ import { cn } from '@/lib/utils';
 
 export function meta() {
   return [
-    { title: 'Parking Lot ~ your personal promodoro' },
+    { title: '~ things that distracted me' },
     {
       name: 'description',
-      content: 'Manage distraction thoughts captured during focus sessions.',
+      content: 'Manage distraction thoughts captured during my focus sessions.',
     },
   ];
 }
@@ -71,9 +71,9 @@ export default function DistractionsPage() {
         {/* Header */}
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-xl font-semibold tracking-tight">Parking Lot</h1>
+            <h1 className="text-xl font-semibold tracking-tight">Things that distracted me</h1>
             <p className="text-muted-foreground mt-1 text-sm">
-              Thoughts that popped up during focus — handle them later.
+              Thoughts that popped up during my focus sessions — write them down now ... handle them later.
             </p>
           </div>
           {state.distractions.length > 0 && (
